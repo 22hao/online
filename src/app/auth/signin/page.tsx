@@ -1,10 +1,25 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createSupabaseServer } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 export default async function SignIn() {
-  const supabase = createServerComponentClient({ cookies: () => cookies() })
+  // 检查环境变量是否存在
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return (
+      <div className="flex min-h-screen flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+            配置错误
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            请配置 Supabase 环境变量
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const supabase = await createSupabaseServer()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (session) {
