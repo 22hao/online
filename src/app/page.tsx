@@ -1,4 +1,5 @@
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { getAdminInfo } from '@/lib/auth'
 import Link from 'next/link'
 
 export default async function Home() {
@@ -16,7 +17,7 @@ export default async function Home() {
     .order('created_at', { ascending: false })
     .limit(3)
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const adminInfo = await getAdminInfo()
 
   return (
     <div className="min-h-screen">
@@ -25,11 +26,11 @@ export default async function Home() {
         <div className="text-center">
           <h1 className="text-5xl font-bold text-gray-900 sm:text-6xl md:text-7xl mb-6">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              技术博客
+              On Sre
             </span>
           </h1>
           <p className="mt-6 max-w-3xl mx-auto text-xl text-gray-600 leading-relaxed">
-            分享前沿技术见解，记录开发实践经验，探索编程世界的无限可能
+            分享 SRE 实践经验，探索运维技术前沿，记录系统可靠性工程之路
           </p>
           <div className="mt-10 flex justify-center space-x-6">
             <Link
@@ -38,7 +39,7 @@ export default async function Home() {
             >
               🚀 开始阅读
             </Link>
-            {session && (
+            {adminInfo && (
               <Link
                 href="/posts/create"
                 className="px-8 py-4 bg-white text-blue-600 text-lg font-medium rounded-lg border-2 border-blue-600 hover:bg-blue-50 transition-colors"
@@ -54,34 +55,34 @@ export default async function Home() {
       <section className="bg-gray-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">为什么选择我们的技术博客？</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">专注 SRE 技术分享</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              基于现代技术栈构建，提供优秀的写作和阅读体验
+              系统可靠性工程实践、运维自动化、监控告警、故障处理经验分享
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-center">
-              <div className="text-4xl mb-4">📝</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Markdown 支持</h3>
+              <div className="text-4xl mb-4">🔧</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">运维实践</h3>
               <p className="text-gray-600">
-                强大的 Markdown 编辑器，支持代码高亮、表格、数学公式等丰富格式
+                分享真实的运维场景和解决方案，从监控到自动化的完整实践
               </p>
             </div>
             
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-center">
-              <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">智能分类</h3>
+              <div className="text-4xl mb-4">📊</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">可靠性工程</h3>
               <p className="text-gray-600">
-                通过分类和标签系统，轻松组织和发现感兴趣的技术内容
+                系统可靠性设计、故障预防、性能优化等 SRE 核心理念和方法
               </p>
             </div>
             
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-center">
               <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">现代技术</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">技术前沿</h3>
               <p className="text-gray-600">
-                基于 Next.js 15 和 Supabase，提供快速、稳定的阅读体验
+                云原生、容器化、微服务等现代运维技术的探索和应用
               </p>
             </div>
           </div>
@@ -95,7 +96,7 @@ export default async function Home() {
             <div className="flex items-center justify-between mb-12">
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">最新文章</h2>
-                <p className="text-gray-600">发现最新的技术见解和开发经验</p>
+                <p className="text-gray-600">发现最新的 SRE 实践和运维技术</p>
               </div>
               <Link
                 href="/posts"
@@ -139,7 +140,7 @@ export default async function Home() {
                     
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <span>
-                        {post.profiles?.name || post.author?.name || post.author?.email}
+                        {post.profiles?.name || post.author?.name || post.author?.email || 'On Sre'}
                       </span>
                       <span>
                         {new Date(post.created_at).toLocaleDateString('zh-CN')}
@@ -153,30 +154,35 @@ export default async function Home() {
         </section>
       )}
 
-      {/* CTA Section */}
-      <section className="bg-blue-600 py-20">
+      {/* About Section */}
+      <section className="bg-slate-50 py-20">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            准备分享你的技术见解吗？
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            关于 On Sre
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            加入我们的技术社区，与其他开发者一起分享知识和经验
+          <p className="text-xl text-gray-600 mb-8">
+            专注于系统可靠性工程（SRE）的技术博客，分享运维实践、故障处理、监控告警、自动化运维等领域的经验和见解。
           </p>
-          {session ? (
-            <Link
-              href="/posts/create"
-              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 text-lg font-medium rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              ✍️ 立即开始写作
-            </Link>
-          ) : (
-            <Link
-              href="/auth/signin"
-              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 text-lg font-medium rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              🚀 立即加入
-            </Link>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+            <div className="text-left">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">🎯 内容方向</h3>
+              <ul className="text-gray-600 space-y-2">
+                <li>• 系统可靠性设计与实践</li>
+                <li>• 监控告警体系建设</li>
+                <li>• 故障处理与复盘</li>
+                <li>• 运维自动化工具</li>
+              </ul>
+            </div>
+            <div className="text-left">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">🛠️ 技术栈</h3>
+              <ul className="text-gray-600 space-y-2">
+                <li>• Kubernetes & Docker</li>
+                <li>• Prometheus & Grafana</li>
+                <li>• CI/CD 流水线</li>
+                <li>• 云原生技术</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
     </div>

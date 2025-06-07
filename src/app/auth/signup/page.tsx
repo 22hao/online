@@ -65,7 +65,14 @@ export default async function SignUp({
               <svg className="h-5 w-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-sm text-red-700">{error}</p>
+              <div>
+                <p className="text-sm text-red-700 font-medium">{error}</p>
+                {error.includes('confirmation email') && (
+                  <p className="text-xs text-red-600 mt-1">
+                    提示：请使用与 SMTP 发送邮箱不同的邮箱地址注册，避免邮件发送冲突
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         )}
