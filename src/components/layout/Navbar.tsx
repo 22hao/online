@@ -11,7 +11,7 @@ export default async function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold">我的博客</span>
+              <span className="text-xl font-bold">On Sre</span>
             </Link>
             <div className="ml-6 flex space-x-4 items-center">
               <Link href="/posts" className="text-gray-700 hover:text-gray-900">

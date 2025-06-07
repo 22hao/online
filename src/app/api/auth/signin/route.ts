@@ -10,36 +10,30 @@ export async function POST(request: Request) {
   try {
     const supabase = await createSupabaseServer()
 
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      options: {
-        emailRedirectTo: `${requestUrl.origin}/auth/callback`,
-      },
     })
 
     if (error) {
       return NextResponse.redirect(
-        `${requestUrl.origin}/auth/signup?error=${encodeURIComponent(error.message)}`,
+        `${requestUrl.origin}/auth/signin?error=${encodeURIComponent(error.message)}`,
         {
           status: 301,
         }
       )
     }
 
-    return NextResponse.redirect(
-      `${requestUrl.origin}/auth/signin?message=${encodeURIComponent('请检查邮箱完成注册')}`,
-      {
-        status: 301,
-      }
-    )
+    return NextResponse.redirect(`${requestUrl.origin}/`, {
+      status: 301,
+    })
   } catch (error) {
-    console.error('Signup error:', error)
+    console.error('Signin error:', error)
     return NextResponse.redirect(
-      `${requestUrl.origin}/auth/signup?error=${encodeURIComponent('注册失败，请稍后重试')}`,
+      `${requestUrl.origin}/auth/signin?error=${encodeURIComponent('登录失败，请稍后重试')}`,
       {
         status: 301,
       }
     )
   }
-}
+} 
