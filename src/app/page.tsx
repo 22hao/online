@@ -8,11 +8,7 @@ export default async function Home() {
   // 获取最新的3篇文章
   const { data: latestPosts } = await supabase
     .from('posts')
-    .select(`
-      *,
-      author:author_id(email, name),
-      profiles!posts_author_id_fkey(name, avatar_url)
-    `)
+    .select('*')
     .eq('published', true)
     .order('created_at', { ascending: false })
     .limit(3)
@@ -139,9 +135,7 @@ export default async function Home() {
                     )}
                     
                     <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>
-                        {post.profiles?.name || post.author?.name || post.author?.email || 'On Sre'}
-                      </span>
+                      <span>On Sre</span>
                       <span>
                         {new Date(post.created_at).toLocaleDateString('zh-CN')}
                       </span>

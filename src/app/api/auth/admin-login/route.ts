@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
 // 管理员账号配置（你可以修改这些）
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@onsre.com'
@@ -28,7 +27,6 @@ export async function POST(request: Request) {
     })
 
     // 设置管理员登录 cookie（24小时有效）
-    const cookieStore = await cookies()
     const adminToken = Buffer.from(`${ADMIN_EMAIL}:${Date.now()}`).toString('base64')
     
     response.cookies.set('admin-session', adminToken, {
