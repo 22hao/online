@@ -12,21 +12,27 @@ export default async function Navbar() {
             <Link href="/" className="flex items-center">
               <span className="text-xl font-bold">On Sre</span>
             </Link>
-            <div className="ml-6 flex space-x-4 items-center">
-              <Link href="/posts" className="text-gray-700 hover:text-gray-900">
+            <div className="ml-12 flex space-x-6 items-center">
+              <Link href="/posts" className="text-gray-700 hover:text-gray-900 font-medium">
                 文章列表
               </Link>
-              {adminInfo && (
-                <Link href="/posts/create" className="text-gray-700 hover:text-gray-900">
-                  写文章
-                </Link>
-              )}
+              <Link href="/posts?category=大数据" className="text-gray-700 hover:text-gray-900 font-medium">
+                大数据
+              </Link>
+              <Link href="/posts?category=安全" className="text-gray-700 hover:text-gray-900 font-medium">
+                安全
+              </Link>
             </div>
           </div>
           <div className="flex items-center">
             {adminInfo ? (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-700">管理员</span>
+                <Link 
+                  href="/admin" 
+                  className="text-gray-700 hover:text-gray-900 font-medium"
+                >
+                  管理员
+                </Link>
                 <form action="/api/auth/admin-logout" method="post">
                   <button type="submit" className="text-gray-700 hover:text-gray-900">
                     退出

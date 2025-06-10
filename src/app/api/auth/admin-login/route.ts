@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     // 创建响应并设置管理员登录状态 cookie
-    const response = NextResponse.redirect(`${requestUrl.origin}/posts/create`, {
+    const response = NextResponse.redirect(`${requestUrl.origin}/admin`, {
       status: 301,
     })
 

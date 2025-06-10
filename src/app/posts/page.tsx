@@ -24,8 +24,7 @@ export default async function Posts() {
     <div className="w-full max-w-4xl mx-auto py-16 px-8">
       <div className="flex justify-between items-center mb-12">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">技术博客</h1>
-          <p className="text-gray-600">分享技术见解和开发经验</p>
+          <h1 className="text-4xl font-bold text-gray-900">文章列表</h1>
         </div>
         {adminInfo && (
           <Link
@@ -82,12 +81,22 @@ export default async function Posts() {
                   <span>👤 管理员</span>
                   <span>📅 {new Date(post.created_at).toLocaleDateString('zh-CN')}</span>
                 </div>
-                <Link 
-                  href={`/posts/${post.slug}`}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  阅读全文 →
-                </Link>
+                <div className="flex items-center space-x-2">
+                  {adminInfo && (
+                    <Link 
+                      href={`/posts/edit/${post.slug}`}
+                      className="text-orange-600 hover:text-orange-800 font-medium"
+                    >
+                      ✏️ 编辑
+                    </Link>
+                  )}
+                  <Link 
+                    href={`/posts/${post.slug}`}
+                    className="text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    阅读全文 →
+                  </Link>
+                </div>
               </div>
             </article>
           ))}

@@ -1,4 +1,5 @@
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { getAdminInfo } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -37,17 +38,18 @@ export async function generateMetadata({ params }: PostPageProps) {
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
   const supabase = await createSupabaseServer()
+  const adminInfo = await getAdminInfo()
   
-  const { data: post } = await supabase
+  const { data: post, error } = await supabase
     .from('posts')
-    .select(`
-      *,
-      author:author_id(email, name),
-      profiles!posts_author_id_fkey(name, avatar_url, bio)
-    `)
+    .select('*')
     .eq('slug', slug)
     .eq('published', true)
     .single()
+
+  if (error) {
+    console.error('Post query error:', error)
+  }
 
   if (!post) {
     notFound()
@@ -57,10 +59,18 @@ export default async function PostPage({ params }: PostPageProps) {
     <article className="w-full max-w-4xl mx-auto py-16 px-8">
       {/* 文章头部 */}
       <header className="mb-12">
-        <div className="flex items-center text-sm text-gray-500 mb-4">
+        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
           <Link href="/posts" className="hover:text-blue-600">
             ← 返回文章列表
           </Link>
+          {adminInfo && (
+            <Link
+              href={`/posts/edit/${slug}`}
+              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              ✏️ 编辑文章
+            </Link>
+          )}
         </div>
         
         <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
@@ -75,19 +85,8 @@ export default async function PostPage({ params }: PostPageProps) {
 
         <div className="flex items-center justify-between pb-6 border-b border-gray-200">
           <div className="flex items-center space-x-4">
-            {post.profiles?.avatar_url && (
-              <Image
-                src={post.profiles.avatar_url}
-                alt={post.profiles.name || '作者'}
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-full"
-              />
-            )}
             <div>
-              <div className="font-medium text-gray-900">
-                {post.profiles?.name || post.author?.name || post.author?.email}
-              </div>
+              <div className="font-medium text-gray-900">管理员</div>
               <div className="text-sm text-gray-500">
                 {new Date(post.created_at).toLocaleDateString('zh-CN', {
                   year: 'numeric',
@@ -160,29 +159,7 @@ export default async function PostPage({ params }: PostPageProps) {
         </ReactMarkdown>
       </div>
 
-      {/* 作者信息 */}
-      {post.profiles?.bio && (
-        <div className="mt-12 p-6 bg-gray-50 rounded-xl">
-          <h3 className="text-lg font-semibold mb-2">关于作者</h3>
-          <div className="flex items-start space-x-4">
-            {post.profiles.avatar_url && (
-              <Image
-                src={post.profiles.avatar_url}
-                alt={post.profiles.name || '作者'}
-                width={64}
-                height={64}
-                className="w-16 h-16 rounded-full"
-              />
-            )}
-            <div>
-              <div className="font-medium text-gray-900 mb-1">
-                {post.profiles.name || post.author?.name || post.author?.email}
-              </div>
-              <p className="text-gray-600">{post.profiles.bio}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 相关推荐或其他内容可以放在这里 */}
     </article>
   )
 } 
