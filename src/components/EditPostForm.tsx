@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import MDEditor from '@uiw/react-md-editor'
+import RichTextEditor from './RichTextEditor'
 
 interface Category {
   name: string
@@ -199,24 +199,16 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
           </div>
         </div>
 
-        {/* Markdown 编辑器 */}
+        {/* 富文本编辑器 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             文章内容 *
           </label>
-          <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <MDEditor
-              value={content}
-              onChange={(val) => setContent(val || '')}
-              preview="edit"
-              hideToolbar={false}
-              visibleDragbar={false}
-              textareaProps={{
-                placeholder: '使用 Markdown 语法编写你的文章内容...\n\n支持：\n- 标题：# ## ###\n- 代码块：```bash\n- 列表：- 或 1.\n- 链接：[文本](URL)\n- 图片：![alt](URL)',
-                style: { minHeight: '400px' }
-              }}
-            />
-          </div>
+          <RichTextEditor
+            value={content}
+            onChange={setContent}
+            placeholder="编辑你的文章内容... 支持富文本编辑和 Markdown 语法"
+          />
         </div>
 
         {/* 发布选项 */}

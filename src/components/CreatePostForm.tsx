@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import MDEditor from '@uiw/react-md-editor'
-import TurndownService from 'turndown'
+import RichTextEditor from './RichTextEditor'
 
 interface Category {
   name: string
@@ -27,7 +26,6 @@ export default function CreatePostForm() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const router = useRouter()
-  const turndownService = new TurndownService()
 
   // 获取分类和标签建议
   useEffect(() => {
@@ -237,28 +235,12 @@ export default function CreatePostForm() {
             />
           </div>
 
-          {/* 内容编辑器 - 恢复原来的样式 */}
+          {/* 内容编辑器 - 富文本编辑器 */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <MDEditor
+            <RichTextEditor
               value={content}
-              onChange={(val) => setContent(val || '')}
-              preview="edit"
-              hideToolbar={false}
-              visibleDragbar={false}
-              height={700}
-              data-color-mode="light"
-              textareaProps={{
-                placeholder: '开始写作吧...\n\n✨ 支持 Markdown 语法\n📝 可以导入外部文件\n🎯 专注于内容创作',
-                style: { 
-                  fontSize: '16px',
-                  lineHeight: '1.8',
-                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                  padding: '24px'
-                }
-              }}
-              style={{
-                backgroundColor: 'white',
-              }}
+              onChange={setContent}
+              placeholder="开始写作吧... 支持富文本编辑和 Markdown 语法"
             />
           </div>
 

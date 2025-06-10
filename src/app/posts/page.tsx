@@ -1,6 +1,7 @@
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { getAdminInfo } from '@/lib/auth'
 import Link from 'next/link'
+import DeletePostButton from '@/components/DeletePostButton'
 
 export const revalidate = 0
 
@@ -81,20 +82,26 @@ export default async function Posts() {
                   <span>👤 管理员</span>
                   <span>📅 {new Date(post.created_at).toLocaleDateString('zh-CN')}</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   {adminInfo && (
-                    <Link 
-                      href={`/posts/edit/${post.slug}`}
-                      className="text-orange-600 hover:text-orange-800 font-medium"
-                    >
-                      ✏️ 编辑
-                    </Link>
+                    <>
+                      <Link 
+                        href={`/posts/edit/${post.slug}`}
+                        className="text-orange-600 hover:text-orange-800 font-medium"
+                      >
+                        ✏️ 编辑
+                      </Link>
+                      <DeletePostButton 
+                        postId={post.id} 
+                        postTitle={post.title} 
+                      />
+                    </>
                   )}
                   <Link 
                     href={`/posts/${post.slug}`}
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
-                    阅读全文 →
+                    👁️ 查看
                   </Link>
                 </div>
               </div>

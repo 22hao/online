@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import DeletePostButton from '@/components/DeletePostButton'
 
 interface Post {
   id: string
@@ -265,6 +266,10 @@ export default function PostsManager({ posts }: PostsManagerProps) {
                     >
                       ✏️ 编辑
                     </Link>
+                    <DeletePostButton
+                      postId={post.id}
+                      postTitle={post.title}
+                    />
                   </div>
                 </div>
               </div>
