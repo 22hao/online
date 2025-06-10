@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import MDEditor from '@uiw/react-md-editor'
-import mammoth from 'mammoth/mammoth.browser'
 import TurndownService from 'turndown'
 
 interface Category {
@@ -105,9 +104,7 @@ export default function CreatePostForm() {
         
         case 'doc':
         case 'docx':
-          const arrayBuffer = await file.arrayBuffer()
-          const result = await mammoth.convertToHtml({ arrayBuffer })
-          importedContent = turndownService.turndown(result.value)
+          throw new Error('Word 文档导入功能暂时不可用，请使用 Markdown 或文本文件')
           break
         
         default:
