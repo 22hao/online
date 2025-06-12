@@ -20,14 +20,11 @@ export default async function Home() {
       {/* Simple Hero Section */}
       <section className="max-w-6xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl mb-8">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               On Sre
             </span>
           </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            技术博客
-          </p>
           {adminInfo && (
             <Link
               href="/posts/create"

@@ -54,6 +54,13 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
     fetchCategories()
   }, [])
 
+  // 清理HTML标签的函数
+  const stripHtmlTags = (html: string) => {
+    const tmp = document.createElement('div')
+    tmp.innerHTML = html
+    return tmp.textContent || tmp.innerText || ''
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -61,6 +68,9 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
 
     try {
       const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+      
+      // 自动生成摘要时清理HTML标签
+      const autoExcerpt = excerpt || stripHtmlTags(content).substring(0, 200)
 
       const response = await fetch('/api/posts/update', {
         method: 'PUT',
@@ -71,7 +81,7 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
           id: initialData.id,
           title,
           content,
-          excerpt: excerpt || content.substring(0, 200),
+          excerpt: autoExcerpt,
           category: category || null,
           tags: tagsArray.length > 0 ? tagsArray : null,
           published: isPublished,

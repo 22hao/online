@@ -5,16 +5,27 @@ import DeletePostButton from '@/components/DeletePostButton'
 
 export const revalidate = 0
 
-export default async function Posts() {
+interface PostsPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function Posts({ searchParams }: PostsPageProps) {
   const supabase = await createSupabaseServer()
   const adminInfo = await getAdminInfo()
+  const params = await searchParams
+  const category = params.category as string | undefined
   
-  // 简化查询，移除可能有问题的关联
-  const { data: posts, error } = await supabase
+  // 构建查询，如果有分类参数则过滤
+  let query = supabase
     .from('posts')
     .select('*')
     .eq('published', true)
-    .order('created_at', { ascending: false })
+    
+  if (category) {
+    query = query.eq('category', category)
+  }
+  
+  const { data: posts, error } = await query.order('created_at', { ascending: false })
 
   // 如果查询失败，显示错误信息
   if (error) {
@@ -25,7 +36,14 @@ export default async function Posts() {
     <div className="w-full max-w-4xl mx-auto py-16 px-8">
       <div className="flex justify-between items-center mb-12">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900">文章列表</h1>
+          <h1 className="text-4xl font-bold text-gray-900">
+            {category ? `${category} - 文章列表` : '文章列表'}
+          </h1>
+          {category && (
+            <p className="text-gray-600 mt-2">
+              <Link href="/posts" className="hover:text-blue-600">所有文章</Link> / {category}
+            </p>
+          )}
         </div>
         {adminInfo && (
           <Link
@@ -111,8 +129,12 @@ export default async function Posts() {
       ) : (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">📝</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">还没有文章</h2>
-          <p className="text-gray-600 mb-6">开始分享你的技术见解吧</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {category ? `还没有${category}相关文章` : '还没有文章'}
+          </h2>
+          <p className="text-gray-600 mb-6">
+            {category ? `开始创建第一篇${category}文章吧` : '开始分享你的技术见解吧'}
+          </p>
           {adminInfo && (
             <Link
               href="/posts/create"
