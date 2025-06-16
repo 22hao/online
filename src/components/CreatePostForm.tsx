@@ -14,6 +14,7 @@ export default function CreatePostForm() {
   const [content, setContent] = useState('')
   const [excerpt, setExcerpt] = useState('')
   const [category, setCategory] = useState('')
+  const [subcategory, setSubcategory] = useState('')
   const [tags, setTags] = useState('')
   const [isPublished, setIsPublished] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -139,6 +140,24 @@ export default function CreatePostForm() {
     return tmp.textContent || tmp.innerText || ''
   }
 
+  // 二级分类选项
+  const subcategoryOptions: Record<string, { key: string; label: string }[]> = {
+    '运维': [
+      { key: 'linux', label: 'linux基础' },
+      { key: 'log', label: '日志系统' },
+      { key: 'monitor', label: '监控系统' },
+      { key: 'trace', label: '链路系统' },
+      { key: 'db', label: '数据库' },
+    ],
+    '大数据': [
+      { key: 'hadoop', label: 'Hadoop' },
+      { key: 'spark', label: 'Spark' },
+      { key: 'flink', label: 'Flink' },
+      { key: 'hive', label: 'Hive' },
+      { key: 'kafka', label: 'Kafka' },
+    ],
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -161,6 +180,7 @@ export default function CreatePostForm() {
           content,
           excerpt: autoExcerpt,
           category: category || null,
+          subcategory: subcategory || null,
           tags: tagsArray.length > 0 ? tagsArray : null,
           published: isPublished,
           slug,
@@ -192,8 +212,6 @@ export default function CreatePostForm() {
       setTags(newTags)
     }
   }
-
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -314,7 +332,10 @@ export default function CreatePostForm() {
                 </label>
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e) => {
+                    setCategory(e.target.value)
+                    setSubcategory('') // 切换一级分类时重置二级分类
+                  }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
                   <option value="">选择分类</option>
@@ -325,6 +346,25 @@ export default function CreatePostForm() {
                   ))}
                 </select>
               </div>
+
+              {/* 二级分类 */}
+              {category && subcategoryOptions[category] && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    二级分类
+                  </label>
+                  <select
+                    value={subcategory}
+                    onChange={(e) => setSubcategory(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  >
+                    <option value="">选择二级分类</option>
+                    {subcategoryOptions[category].map((sub) => (
+                      <option key={sub.key} value={sub.key}>{sub.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* 标签 */}
               <div>

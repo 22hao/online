@@ -3,6 +3,8 @@
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface ContentRendererProps {
   content: string

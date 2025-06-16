@@ -29,6 +29,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: '📂'
     },
     {
+      href: '/admin/subcategories',
+      label: '二级分类管理',
+      icon: '📑'
+    },
+    {
       href: '/admin/tags',
       label: '标签管理',
       icon: '🏷️'
