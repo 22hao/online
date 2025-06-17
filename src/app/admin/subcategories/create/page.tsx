@@ -12,8 +12,8 @@ function slugify(str: string) {
     .replace(/^-+|-+$/g, '');        // 去除首尾-
 }
 
-// 顶层导出 Server Action
-export async function handleCreate(formData: FormData) {
+// 顶层 Server Action
+async function handleCreate(formData: FormData) {
   'use server'
   const supabase = await createSupabaseServer()
   const category_id = Number(formData.get('category_id'))
