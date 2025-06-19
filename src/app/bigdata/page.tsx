@@ -1,19 +1,16 @@
 import { getArticlesByCategoryAndSub } from '@/lib/article';
+import { getSubcategoriesByCategory } from '@/lib/categories';
 import CategoryPage from '@/components/CategoryPage';
 
 export default async function BigDataPage({ searchParams }: { searchParams: { sub?: string } }) {
   const currentSub = searchParams?.sub || '';
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/subcategories?category=大数据`, { cache: 'no-store' });
-  const { subcategories } = await res.json();
+  const subcategories = await getSubcategoriesByCategory('大数据');
   const articles = await getArticlesByCategoryAndSub('大数据', currentSub);
 
   return (
     <CategoryPage
       category="bigdata"
-      subcategories={subcategories.map((sub: any) => ({ key: sub.key, label: sub.label }))}
+      subcategories={subcategories}
       currentSub={currentSub}
       articles={articles}
     />
