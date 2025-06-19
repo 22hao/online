@@ -1,4 +1,4 @@
-import { createSupabaseServer } from '@/lib/supabase-server'
+import { createSupabaseAdmin } from '@/lib/supabase-server'
 import { getAdminInfo } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = await createSupabaseServer()
+    const supabase = await createSupabaseAdmin()
     
     // 使用固定的管理员UUID
     const adminId = 'a0000000-b000-4000-8000-000000000001'

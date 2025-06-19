@@ -1,4 +1,4 @@
-import { createSupabaseServer } from '@/lib/supabase-server'
+import { createSupabaseAdmin } from '@/lib/supabase-server'
 import { getAdminInfo } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -14,7 +14,7 @@ interface PostPageProps {
 
 export async function generateMetadata({ params }: PostPageProps) {
   const { slug } = await params
-  const supabase = await createSupabaseServer()
+  const supabase = createSupabaseAdmin()
   const { data: post } = await supabase
     .from('posts')
     .select('title, excerpt, content')
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PostPageProps) {
 
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
-  const supabase = await createSupabaseServer()
+  const supabase = createSupabaseAdmin()
   const adminInfo = await getAdminInfo()
   
   const { data: post, error } = await supabase

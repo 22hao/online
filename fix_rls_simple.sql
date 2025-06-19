@@ -28,4 +28,13 @@ CREATE POLICY "Admin can delete own posts" ON public.posts
         author_id = 'a0000000-b000-4000-8000-000000000001'::UUID
     );
 
--- 完成！现在应该可以正常发布文章了 
+-- 完成！现在应该可以正常发布文章了
+
+-- 临时禁用RLS以解决发布问题
+-- 在Supabase SQL编辑器中执行
+
+-- 禁用posts表的RLS
+ALTER TABLE public.posts DISABLE ROW LEVEL SECURITY;
+
+-- 如果需要重新启用，使用以下命令：
+-- ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY; 

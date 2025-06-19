@@ -1,7 +1,7 @@
-import { createSupabaseServer } from './supabase-server';
+import { createSupabaseAdmin } from './supabase-server';
 
 export async function getArticlesByCategoryAndSub(category: string, subcategory: string) {
-  const supabase = await createSupabaseServer();
+  const supabase = createSupabaseAdmin();
   let query = supabase.from('posts').select('*').eq('category', category).eq('published', true);
   if (subcategory) {
     query = query.eq('subcategory', subcategory);

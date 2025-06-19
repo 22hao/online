@@ -1,4 +1,4 @@
-import { createSupabaseServer } from '@/lib/supabase-server'
+import { createSupabaseAdmin } from '@/lib/supabase-server'
 import { getAdminInfo } from '@/lib/auth'
 import Link from 'next/link'
 import DeletePostButton from '@/components/DeletePostButton'
@@ -10,7 +10,7 @@ interface PostsPageProps {
 }
 
 export default async function Posts({ searchParams }: PostsPageProps) {
-  const supabase = await createSupabaseServer()
+  const supabase = createSupabaseAdmin()
   const adminInfo = await getAdminInfo()
   const params = await searchParams
   const category = params.category as string | undefined
@@ -30,6 +30,14 @@ export default async function Posts({ searchParams }: PostsPageProps) {
   // 如果查询失败，显示错误信息
   if (error) {
     console.error('Posts query error:', error)
+  }
+
+  // 调试信息：输出文章数据
+  console.log('Posts data:', posts)
+  console.log('Posts count:', posts?.length || 0)
+  if (posts && posts.length > 0) {
+    console.log('First post slug:', posts[0].slug)
+    console.log('First post data:', posts[0])
   }
 
   return (

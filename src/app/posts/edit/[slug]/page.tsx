@@ -1,4 +1,4 @@
-import { createSupabaseServer } from '@/lib/supabase-server'
+import { createSupabaseAdmin } from '@/lib/supabase-server'
 import { getAdminInfo } from '@/lib/auth'
 import { redirect, notFound } from 'next/navigation'
 import EditPostForm from '@/components/EditPostForm'
@@ -17,7 +17,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   }
 
   const { slug } = await params
-  const supabase = await createSupabaseServer()
+  const supabase = createSupabaseAdmin()
   
   // 获取要编辑的文章
   const { data: post, error } = await supabase

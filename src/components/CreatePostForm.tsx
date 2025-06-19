@@ -97,8 +97,15 @@ export default function CreatePostForm() {
           break
         
         case 'txt':
+          // 最简单的方式：每行都独立显示，完全按原文件格式
           const textContent = await file.text()
-          importedContent = textContent.replace(/\n/g, '\n\n')
+          const lines = textContent.split('\n')
+          importedContent = lines.map(line => {
+            if (line.trim() === '') {
+              return '<div><br></div>' // 空行保持为空行
+            }
+            return `<div>${line}</div>` // 每行独立显示
+          }).join('')
           break
         
         case 'doc':

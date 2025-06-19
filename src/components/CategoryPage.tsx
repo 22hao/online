@@ -31,13 +31,29 @@ export default function CategoryPage({ category, subcategories, currentSub, arti
       {/* 文章列表 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {articles.map(article => (
-          <div key={article.id} className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-bold mb-2">{article.title}</h2>
-            <p className="text-gray-600 mb-2">{article.summary}</p>
-            <div className="text-sm text-gray-400">{article.subcategory}</div>
-          </div>
+          <Link key={article.id} href={`/posts/${article.slug}`} className="block">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <h2 className="text-lg font-bold mb-2 hover:text-blue-600 transition-colors">{article.title}</h2>
+              <p className="text-gray-600 mb-2">{article.excerpt || article.content?.substring(0, 100) + '...'}</p>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-400">{article.subcategory || article.category}</div>
+                <div className="text-sm text-gray-400">
+                  {new Date(article.created_at).toLocaleDateString('zh-CN')}
+                </div>
+              </div>
+            </div>
+          </Link>
         ))}
       </div>
+      
+      {/* 如果没有文章 */}
+      {articles.length === 0 && (
+        <div className="text-center py-16">
+          <div className="text-6xl mb-4">📝</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">暂无文章</h2>
+          <p className="text-gray-600">这个分类下还没有文章</p>
+        </div>
+      )}
     </div>
   );
 } 
