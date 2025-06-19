@@ -13,8 +13,8 @@ export default async function Navbar() {
               <span className="text-xl font-bold">On Sre</span>
             </Link>
             <div className="ml-16 flex space-x-6 items-center">
-              <Link href="/posts" className="text-gray-700 hover:text-gray-900 font-medium">
-                文章列表
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">
+                首页
               </Link>
               <Link href="/ops" className="text-gray-700 hover:text-gray-900 font-medium">
                 运维
