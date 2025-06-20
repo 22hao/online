@@ -19,6 +19,9 @@ export default async function Navbar() {
               <Link href="/ops" className="text-gray-700 hover:text-gray-900 font-medium">
                 运维
               </Link>
+              <Link href="/cloudnative" className="text-gray-700 hover:text-gray-900 font-medium">
+                云原生
+              </Link>
               <Link href="/bigdata" className="text-gray-700 hover:text-gray-900 font-medium">
                 大数据
               </Link>

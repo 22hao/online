@@ -10,12 +10,16 @@ export type Post = {
   id: string
   title: string
   content: string
+  excerpt?: string
+  category?: string
+  subcategory?: string
+  slug: string
   author_id: string
   published: boolean
   created_at: string
   updated_at: string
   author?: Profile
-  tags?: Tag[]
+  tags?: string[]
 }
 
 export type Tag = {

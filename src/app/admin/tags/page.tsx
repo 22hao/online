@@ -1,38 +1,20 @@
-import { createSupabaseServer } from '@/lib/supabase-server'
-import { getAdminInfo } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import AdminLayout from '@/components/admin/AdminLayout'
 import TagManager from '@/components/admin/TagManager'
 
-export default async function AdminTags() {
-  // 检查管理员权限
-  const adminInfo = await getAdminInfo()
-  if (!adminInfo) {
-    redirect('/admin/login')
-  }
+interface TagStats {
+  total: number
+  published: number
+}
 
-  const supabase = await createSupabaseServer()
-
-  // 获取所有文章的标签信息
-  const { data: allPosts } = await supabase
-    .from('posts')
-    .select('tags, published')
-
-  // 统计标签数据
-  const tagStats = allPosts?.reduce((acc, post) => {
-    if (post.tags && Array.isArray(post.tags)) {
-      post.tags.forEach((tag: string) => {
-        if (!acc[tag]) {
-          acc[tag] = { total: 0, published: 0 }
-        }
-        acc[tag].total += 1
-        if (post.published) {
-          acc[tag].published += 1
-        }
-      })
-    }
-    return acc
-  }, {} as Record<string, { total: number; published: number }>) || {}
+export default function AdminTags() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [tagStats, setTagStats] = useState<Record<string, TagStats>>({})
 
   // 常用的 SRE 标签推荐
   const recommendedTags = [
@@ -66,12 +48,65 @@ export default async function AdminTags() {
     'Envoy'
   ]
 
+  useEffect(() => {
+    async function checkAuthAndFetchData() {
+      try {
+        // 检查管理员权限
+        const authResponse = await fetch('/api/auth/admin-check')
+        if (!authResponse.ok) {
+          router.push('/admin/login')
+          return
+        }
+
+        // 获取标签数据
+        const tagsResponse = await fetch('/api/tags')
+        if (tagsResponse.ok) {
+          const data = await tagsResponse.json()
+          setTagStats(data.tags || {})
+        } else {
+          setError('获取标签数据失败')
+        }
+      } catch (error) {
+        console.error('获取数据失败:', error)
+        setError('获取数据失败')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkAuthAndFetchData()
+  }, [router])
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="text-center py-8">
+          <div className="text-lg">加载中...</div>
+        </div>
+      </AdminLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="text-center py-8">
+          <div className="text-red-600">{error}</div>
+        </div>
+      </AdminLayout>
+    )
+  }
+
   // 获取标签使用频率排序
   const sortedTags = Object.entries(tagStats)
     .sort(([,a], [,b]) => b.total - a.total)
 
   // 获取最受欢迎的标签（前10个）
   const popularTags = sortedTags.slice(0, 10)
+
+  // 计算统计数据
+  const totalTagUsage = Object.values(tagStats).reduce((sum, tag) => sum + tag.total, 0)
+  const totalPosts = Object.values(tagStats).reduce((sum, tag) => sum + Math.min(tag.total, 1), 0) // 估算文章数
 
   return (
     <AdminLayout>
@@ -120,7 +155,7 @@ export default async function AdminTags() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">标签使用总次数</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {Object.values(tagStats).reduce((sum, tag) => sum + tag.total, 0)}
+                  {totalTagUsage}
                 </p>
               </div>
             </div>
@@ -134,8 +169,8 @@ export default async function AdminTags() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">平均每篇文章</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {allPosts && allPosts.length > 0 ? 
-                    Math.round(Object.values(tagStats).reduce((sum, tag) => sum + tag.total, 0) / allPosts.length * 10) / 10 
+                  {totalPosts > 0 ? 
+                    Math.round(totalTagUsage / totalPosts * 10) / 10 
                     : 0} 
                   <span className="text-sm text-gray-500 ml-1">个标签</span>
                 </p>

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, content, excerpt, category, tags, published, slug } = body
+    const { title, content, excerpt, category, subcategory, tags, published, slug } = body
 
     // 验证必填字段
     if (!title || !content) {
@@ -23,6 +23,8 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
+
+    console.log('创建文章，接收到的数据:', { title, category, subcategory, published })
 
     const supabase = await createSupabaseAdmin()
     
@@ -36,6 +38,7 @@ export async function POST(request: Request) {
         content,
         excerpt: excerpt || content.substring(0, 200),
         category: category || null,
+        subcategory: subcategory || null,
         tags: tags || null,
         author_id: adminId,
         published: published || false,
@@ -53,6 +56,7 @@ export async function POST(request: Request) {
       )
     }
 
+    console.log('文章创建成功:', data)
     return NextResponse.json({ success: true, data })
   } catch (error) {
     console.error('API error:', error)

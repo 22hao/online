@@ -1,48 +1,76 @@
-import { createSupabaseServer } from '@/lib/supabase-server'
-import { getAdminInfo } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import AdminLayout from '@/components/admin/AdminLayout'
 import CategoryManager from '@/components/admin/CategoryManager'
 
-export default async function AdminCategories() {
-  // 检查管理员权限
-  const adminInfo = await getAdminInfo()
-  if (!adminInfo) {
-    redirect('/admin/login')
-  }
+interface CategoryStats {
+  total: number
+  published: number
+}
 
-  const supabase = await createSupabaseServer()
+export default function AdminCategories() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [categoryStats, setCategoryStats] = useState<Record<string, CategoryStats>>({})
+  const [totalCategories, setTotalCategories] = useState(0)
+  const [totalPosts, setTotalPosts] = useState(0)
 
-  // 获取所有分类
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('*')
-    .order('name')
+  useEffect(() => {
+    async function checkAuthAndFetchData() {
+      try {
+        // 检查管理员权限
+        const authResponse = await fetch('/api/auth/admin-check')
+        if (!authResponse.ok) {
+          router.push('/admin/login')
+          return
+        }
 
-  // 获取所有文章的分类信息来统计使用情况
-  const { data: allPosts } = await supabase
-    .from('posts')
-    .select('category, published')
-
-  // 统计分类使用数据
-  const categoryStats = allPosts?.reduce((acc, post) => {
-    if (post.category) {
-      if (!acc[post.category]) {
-        acc[post.category] = { total: 0, published: 0 }
-      }
-      acc[post.category].total += 1
-      if (post.published) {
-        acc[post.category].published += 1
+        // 获取分类数据
+        const categoriesResponse = await fetch('/api/categories')
+        if (categoriesResponse.ok) {
+          const data = await categoriesResponse.json()
+          setCategoryStats(data.categories || {})
+          setTotalCategories(data.allCategories?.length || 0)
+          
+          // 计算总文章数
+          const total = Object.values(data.categories || {}).reduce((sum: number, cat: any) => sum + cat.total, 0)
+          setTotalPosts(total)
+        } else {
+          setError('获取分类数据失败')
+        }
+      } catch (error) {
+        console.error('获取数据失败:', error)
+        setError('获取数据失败')
+      } finally {
+        setLoading(false)
       }
     }
-    return acc
-  }, {} as Record<string, { total: number; published: number }>) || {}
 
-  // 合并分类信息和使用统计
-  const allCategoryStats = categories?.reduce((acc, category) => {
-    acc[category.name] = categoryStats[category.name] || { total: 0, published: 0 }
-    return acc
-  }, {} as Record<string, { total: number; published: number }>) || {}
+    checkAuthAndFetchData()
+  }, [router])
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="text-center py-8">
+          <div className="text-lg">加载中...</div>
+        </div>
+      </AdminLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="text-center py-8">
+          <div className="text-red-600">{error}</div>
+        </div>
+      </AdminLayout>
+    )
+  }
 
   return (
     <AdminLayout>
@@ -77,7 +105,7 @@ export default async function AdminCategories() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">总分类数</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {categories?.length || 0}
+                  {totalCategories}
                 </p>
               </div>
             </div>
@@ -91,7 +119,7 @@ export default async function AdminCategories() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">总文章数</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {Object.values(categoryStats).reduce((sum, cat) => sum + cat.total, 0)}
+                  {totalPosts}
                 </p>
               </div>
             </div>
@@ -99,7 +127,7 @@ export default async function AdminCategories() {
         </div>
 
         {/* 分类管理器 */}
-        <CategoryManager initialCategories={allCategoryStats} />
+        <CategoryManager initialCategories={categoryStats} />
       </div>
     </AdminLayout>
   )

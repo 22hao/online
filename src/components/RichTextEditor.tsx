@@ -17,6 +17,18 @@ interface RichTextEditorProps {
 
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
   const [editorMode, setEditorMode] = useState<'rich' | 'markdown'>('rich') // 默认富文本模式
+  const [contentWarning, setContentWarning] = useState('')
+
+  // 内容长度检查 (HTML格式需要更高限制)
+  useEffect(() => {
+    if (value && value.length > 300000) {
+      setContentWarning('内容过长，可能影响编辑器性能')
+    } else if (value && value.length > 600000) {
+      setContentWarning('内容严重超长，请考虑分段发布')
+    } else {
+      setContentWarning('')
+    }
+  }, [value])
 
   // 添加自定义字体到 Quill
   useEffect(() => {
@@ -118,6 +130,18 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     'color', 'background', 'script', 'blockquote', 'code-block', 
     'list', 'bullet', 'indent', 'align', 'link', 'image'
   ]
+
+  // 安全的onChange处理
+  const handleContentChange = (newValue: string) => {
+    // 如果内容过长，截断并显示警告 (支持HTML格式的更高限制)
+    if (newValue && newValue.length > 1000000) {
+      const truncated = newValue.substring(0, 1000000)
+      setContentWarning('内容已自动截断至100万字符，避免浏览器卡死')
+      onChange(truncated)
+    } else {
+      onChange(newValue)
+    }
+  }
 
   // 获取当前显示的内容
   const getCurrentContent = () => {
@@ -380,13 +404,25 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
           </button>
         </div>
 
+        {/* 内容警告 */}
+        {contentWarning && (
+          <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2">
+            <div className="text-sm text-yellow-800 flex items-center">
+              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {contentWarning}
+            </div>
+          </div>
+        )}
+
         {/* 编辑器内容 */}
         <div className="min-h-96">
           {editorMode === 'rich' ? (
             <div style={{ height: '500px' }}>
               <ReactQuill
                 value={value}
-                onChange={onChange}
+                onChange={handleContentChange}
                 modules={quillModules}
                 formats={quillFormats}
                 placeholder={placeholder || '开始写作...'}
@@ -397,7 +433,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
           ) : (
             <MDEditor
               value={value}
-              onChange={(val) => onChange(val || '')}
+              onChange={(val) => handleContentChange(val || '')}
               preview="live"
               hideToolbar={false}
               visibleDragbar={false}

@@ -1,48 +1,72 @@
-import { createSupabaseServer } from '@/lib/supabase-server'
-import { getAdminInfo } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import AdminLayout from '@/components/admin/AdminLayout'
 import Link from 'next/link'
 
-export default async function AdminDashboard() {
-  // 检查管理员权限
-  const adminInfo = await getAdminInfo()
-  if (!adminInfo) {
-    redirect('/admin/login')
-  }
+interface Post {
+  id: string
+  title: string
+  slug: string
+  created_at: string
+  published: boolean
+  category?: string
+}
 
-  const supabase = await createSupabaseServer()
+interface StatsData {
+  totalPosts: number
+  publishedPosts: number
+  draftPosts: number
+  recentPosts: Post[]
+  categoryStats: Record<string, number>
+}
 
-  // 获取统计数据
-  const [
-    { count: totalPosts },
-    { count: publishedPosts },
-    { count: draftPosts }
-  ] = await Promise.all([
-    supabase.from('posts').select('*', { count: 'exact', head: true }),
-    supabase.from('posts').select('*', { count: 'exact', head: true }).eq('published', true),
-    supabase.from('posts').select('*', { count: 'exact', head: true }).eq('published', false)
-  ])
+export default function AdminDashboard() {
+  const [stats, setStats] = useState<StatsData>({
+    totalPosts: 0,
+    publishedPosts: 0,
+    draftPosts: 0,
+    recentPosts: [],
+    categoryStats: {}
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const router = useRouter()
 
-  // 获取最近的文章
-  const { data: recentPosts } = await supabase
-    .from('posts')
-    .select('id, title, slug, created_at, published')
-    .order('created_at', { ascending: false })
-    .limit(5)
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        setLoading(true)
+        
+        // 检查管理员权限 - 通过API调用
+        const authResponse = await fetch('/api/auth/admin-check')
+        if (!authResponse.ok) {
+          router.push('/admin/login')
+          return
+        }
 
-  // 获取分类统计
-  const { data: allPosts } = await supabase
-    .from('posts')
-    .select('category')
-    .not('category', 'is', null)
+        // 获取统计数据
+        const [postsResponse] = await Promise.all([
+          fetch('/api/posts/stats')
+        ])
 
-  const categoryStats = allPosts?.reduce((acc, post) => {
-    if (post.category) {
-      acc[post.category] = (acc[post.category] || 0) + 1
+        if (postsResponse.ok) {
+          const data = await postsResponse.json()
+          setStats(data)
+        } else {
+          setError('获取统计数据失败')
+        }
+      } catch (error) {
+        console.error('获取面板数据失败:', error)
+        setError('获取数据失败')
+      } finally {
+        setLoading(false)
+      }
     }
-    return acc
-  }, {} as Record<string, number>) || {}
+
+    fetchDashboardData()
+  }, [router])
 
   const quickActions = [
     {
@@ -67,6 +91,13 @@ export default async function AdminDashboard() {
       color: 'bg-purple-500'
     },
     {
+      title: '二级分类管理',
+      description: '管理二级分类',
+      href: '/admin/subcategories',
+      icon: '📑',
+      color: 'bg-indigo-500'
+    },
+    {
       title: '标签管理',
       description: '管理文章标签',
       href: '/admin/tags',
@@ -75,13 +106,33 @@ export default async function AdminDashboard() {
     }
   ]
 
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">加载中...</div>
+        </div>
+      </AdminLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg text-red-600">{error}</div>
+        </div>
+      </AdminLayout>
+    )
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-8">
         {/* 欢迎信息 */}
         <div>
           <h1 className="text-4xl font-bold text-gray-900">管理面板</h1>
-          <p className="text-lg text-gray-600 mt-3">欢迎回来，{adminInfo.name}！管理你的 SRE 技术博客</p>
+          <p className="text-lg text-gray-600 mt-3">欢迎回来！管理你的 SRE 技术博客</p>
         </div>
 
         {/* 统计卡片 */}
@@ -93,7 +144,7 @@ export default async function AdminDashboard() {
               </div>
               <div className="ml-5">
                 <p className="text-base font-medium text-gray-600">总文章数</p>
-                <p className="text-3xl font-bold text-gray-900">{totalPosts || 0}</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.totalPosts}</p>
               </div>
             </div>
           </div>
@@ -105,7 +156,7 @@ export default async function AdminDashboard() {
               </div>
               <div className="ml-5">
                 <p className="text-base font-medium text-gray-600">已发布</p>
-                <p className="text-3xl font-bold text-gray-900">{publishedPosts || 0}</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.publishedPosts}</p>
               </div>
             </div>
           </div>
@@ -117,7 +168,7 @@ export default async function AdminDashboard() {
               </div>
               <div className="ml-5">
                 <p className="text-base font-medium text-gray-600">草稿</p>
-                <p className="text-3xl font-bold text-gray-900">{draftPosts || 0}</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.draftPosts}</p>
               </div>
             </div>
           </div>
@@ -129,7 +180,7 @@ export default async function AdminDashboard() {
               </div>
               <div className="ml-5">
                 <p className="text-base font-medium text-gray-600">分类数量</p>
-                <p className="text-3xl font-bold text-gray-900">{Object.keys(categoryStats).length}</p>
+                <p className="text-3xl font-bold text-gray-900">{Object.keys(stats.categoryStats).length}</p>
               </div>
             </div>
           </div>
@@ -138,21 +189,19 @@ export default async function AdminDashboard() {
         {/* 快捷操作 */}
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">快捷操作</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {quickActions.map((action) => (
               <Link
                 key={action.href}
                 href={action.href}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
               >
-                <div className="flex items-center">
-                  <div className={`p-4 ${action.color} rounded-lg text-white`}>
+                <div className="text-center">
+                  <div className={`inline-flex p-4 ${action.color} rounded-lg text-white mb-4`}>
                     <span className="text-2xl">{action.icon}</span>
                   </div>
-                  <div className="ml-5">
-                    <h3 className="font-semibold text-lg text-gray-900">{action.title}</h3>
-                    <p className="text-base text-gray-600">{action.description}</p>
-                  </div>
+                  <h3 className="font-semibold text-lg text-gray-900 mb-2">{action.title}</h3>
+                  <p className="text-sm text-gray-600">{action.description}</p>
                 </div>
               </Link>
             ))}
@@ -170,8 +219,8 @@ export default async function AdminDashboard() {
               </Link>
             </div>
             <div className="space-y-3">
-              {recentPosts && recentPosts.length > 0 ? (
-                recentPosts.map((post) => (
+              {stats.recentPosts && stats.recentPosts.length > 0 ? (
+                stats.recentPosts.map((post) => (
                   <div key={post.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
                     <div className="flex-1">
                       <Link href={`/posts/${post.slug}`} className="block">
@@ -204,19 +253,19 @@ export default async function AdminDashboard() {
                 管理分类 →
               </Link>
             </div>
-            <div className="space-y-3">
-              {Object.keys(categoryStats).length > 0 ? (
-                Object.entries(categoryStats)
+            <div className="space-y-4">
+              {Object.entries(stats.categoryStats).length > 0 ? (
+                Object.entries(stats.categoryStats)
                   .sort(([,a], [,b]) => b - a)
                   .slice(0, 5)
                   .map(([category, count]) => (
-                    <div key={category} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-                      <span className="font-semibold text-lg text-gray-900">{category}</span>
-                      <span className="text-base text-gray-500 font-medium">{count} 篇文章</span>
+                    <div key={category} className="flex items-center justify-between">
+                      <span className="text-base font-medium text-gray-900">{category}</span>
+                      <span className="text-lg font-bold text-gray-600">{count} 篇</span>
                     </div>
                   ))
               ) : (
-                <p className="text-gray-500 text-center py-6 text-base">暂无分类数据</p>
+                <p className="text-gray-500 text-center py-6 text-base">暂无分类统计</p>
               )}
             </div>
           </div>

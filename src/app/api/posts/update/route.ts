@@ -14,7 +14,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json()
-    const { id, title, content, excerpt, category, tags, published } = body
+    const { id, title, content, excerpt, category, subcategory, tags, published } = body
 
     // 验证必填字段
     if (!id || !title || !content) {
@@ -36,6 +36,7 @@ export async function PUT(request: Request) {
         content,
         excerpt: excerpt || content.substring(0, 200),
         category: category || null,
+        subcategory: subcategory || null,
         tags: tags || null,
         published: published || false,
         updated_at: new Date().toISOString()

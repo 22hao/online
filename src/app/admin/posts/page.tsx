@@ -1,27 +1,79 @@
-import { createSupabaseServer } from '@/lib/supabase-server'
-import { getAdminInfo } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import AdminLayout from '@/components/admin/AdminLayout'
 import PostsManager from '@/components/admin/PostsManager'
-import Link from 'next/link'
 
-export default async function AdminPosts() {
-  // 检查管理员权限
-  const adminInfo = await getAdminInfo()
-  if (!adminInfo) {
-    redirect('/admin/login')
+interface Post {
+  id: string
+  title: string
+  slug: string
+  content: string
+  excerpt?: string
+  category?: string
+  subcategory?: string
+  tags?: string[]
+  published: boolean
+  created_at: string
+  updated_at: string
+}
+
+export default function AdminPosts() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const router = useRouter()
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true)
+        
+        // 检查管理员权限
+        const authResponse = await fetch('/api/auth/admin-check')
+        if (!authResponse.ok) {
+          router.push('/admin/login')
+          return
+        }
+
+        // 获取文章列表
+        const postsResponse = await fetch('/api/posts/list')
+        if (postsResponse.ok) {
+          const data = await postsResponse.json()
+          setPosts(data.posts || [])
+        } else {
+          setError('获取文章列表失败')
+        }
+      } catch (error) {
+        console.error('获取数据失败:', error)
+        setError('获取数据失败')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [router])
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">加载中...</div>
+        </div>
+      </AdminLayout>
+    )
   }
 
-  const supabase = await createSupabaseServer()
-
-  // 获取所有文章
-  const { data: posts, error } = await supabase
-    .from('posts')
-    .select('*')
-    .order('created_at', { ascending: false })
-
   if (error) {
-    console.error('Posts query error:', error)
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg text-red-600">{error}</div>
+        </div>
+      </AdminLayout>
+    )
   }
 
   return (
@@ -42,7 +94,7 @@ export default async function AdminPosts() {
               </div>
               <div className="ml-3">
                 <p className="text-sm text-gray-600">总文章</p>
-                <p className="text-lg font-semibold">{posts?.length || 0}</p>
+                <p className="text-lg font-semibold">{posts.length}</p>
               </div>
             </div>
           </div>
@@ -54,7 +106,7 @@ export default async function AdminPosts() {
               <div className="ml-3">
                 <p className="text-sm text-gray-600">已发布</p>
                 <p className="text-lg font-semibold">
-                  {posts?.filter(p => p.published).length || 0}
+                  {posts.filter(p => p.published).length}
                 </p>
               </div>
             </div>
@@ -67,7 +119,7 @@ export default async function AdminPosts() {
               <div className="ml-3">
                 <p className="text-sm text-gray-600">草稿</p>
                 <p className="text-lg font-semibold">
-                  {posts?.filter(p => !p.published).length || 0}
+                  {posts.filter(p => !p.published).length}
                 </p>
               </div>
             </div>
@@ -75,7 +127,7 @@ export default async function AdminPosts() {
         </div>
 
         {/* 文章管理器 */}
-        <PostsManager posts={posts || []} />
+        <PostsManager posts={posts} />
       </div>
     </AdminLayout>
   )
