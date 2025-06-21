@@ -31,14 +31,14 @@ export default function AdminSubcategories() {
       
       // 并行获取分类和二级分类数据
       const [categoriesResponse, subcategoriesResponse] = await Promise.all([
-        fetch('/api/categories'),
+        fetch('/api/categories/list'),
         fetch('/api/subcategories/list')
       ])
 
       // 处理分类数据
       if (categoriesResponse.ok) {
         const data = await categoriesResponse.json()
-        setCategories(data.allCategories || [])
+        setCategories(data.categories || [])
       }
 
       // 处理二级分类数据

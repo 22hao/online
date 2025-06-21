@@ -10,22 +10,40 @@ export async function GET() {
       return NextResponse.json({ error: '未授权' }, { status: 401 })
     }
 
-    // 临时返回硬编码数据，测试性能
-    const mockCategories = [
-      { id: 1, name: '前端', slug: 'frontend', description: '前端技术' },
-      { id: 2, name: '后端', slug: 'backend', description: '后端技术' },
-      { id: 3, name: '云原生', slug: 'cloudnative', description: '云原生技术' },
-      { id: 4, name: '大数据', slug: 'bigdata', description: '大数据技术' },
-      { id: 5, name: '运维', slug: 'ops', description: '运维技术' },
-      { id: 6, name: '安全', slug: 'security', description: '安全技术' }
-    ]
+    const supabase = await createSupabaseServer()
+    
+    // 从数据库获取真实的分类数据
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select('id, name, slug, description')
+      .order('id', { ascending: true })
 
-    const result = mockCategories.reduce((acc, category) => {
+    if (error) {
+      console.error('获取分类失败:', error)
+      // 如果查询失败，返回与实际数据库匹配的硬编码数据
+      const mockCategories = [
+        { id: 6, name: '云原生', slug: 'cloudnative', description: '云原生技术' },
+        { id: 11, name: '大数据', slug: 'bigdata', description: '大数据技术' },
+        { id: 13, name: '安全', slug: 'security', description: '安全技术' },
+        { id: 14, name: '运维', slug: 'ops', description: '运维技术' },
+        { id: 15, name: '前端', slug: 'frontend', description: '前端技术' }
+      ]
+      
+      const result = mockCategories.reduce((acc, category) => {
+        acc[category.name] = { total: 0, published: 0 }
+        return acc
+      }, {} as Record<string, { total: number; published: number }>)
+
+      return NextResponse.json({ categories: result, allCategories: mockCategories })
+    }
+
+    // 构建分类统计数据（暂时使用0，后续可以添加真实统计）
+    const result = (categories || []).reduce((acc, category) => {
       acc[category.name] = { total: 0, published: 0 }
       return acc
     }, {} as Record<string, { total: number; published: number }>)
 
-    return NextResponse.json({ categories: result, allCategories: mockCategories })
+    return NextResponse.json({ categories: result, allCategories: categories || [] })
   } catch (error) {
     console.error('获取分类失败:', error)
     return NextResponse.json({ error: '获取分类失败' }, { status: 500 })

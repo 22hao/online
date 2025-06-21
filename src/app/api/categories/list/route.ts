@@ -6,18 +6,21 @@ export async function GET() {
   try {
     const supabase = await createSupabaseServer()
     
-    // 尝试最简单的查询：只查name，限制5条，不排序
+    // 查询包含id和name的完整数据
     const { data: categories, error } = await supabase
       .from('categories')
-      .select('name')
-      .limit(5)
+      .select('id, name')
+      .order('id', { ascending: true })
 
     if (error) {
       console.error('获取分类列表失败:', error)
-      // 如果查询失败，返回硬编码数据作为备选
+      // 如果查询失败，返回硬编码数据作为备选（需要包含id）
       const mockCategories = [
-        { name: '前端' }, { name: '后端' }, { name: '云原生' },
-        { name: '大数据' }, { name: '运维' }, { name: '安全' }
+        { id: 6, name: '云原生' },
+        { id: 11, name: '大数据' },
+        { id: 13, name: '安全' },
+        { id: 14, name: '运维' },
+        { id: 15, name: '前端' }
       ]
       return NextResponse.json({ categories: mockCategories })
     }

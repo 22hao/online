@@ -44,13 +44,13 @@ export default function EditSubcategory({ params }: { params: { id: string } }) 
       try {
         // 并行获取分类列表和二级分类详情
         const [categoriesResponse, subcategoryResponse] = await Promise.all([
-          fetch('/api/categories'),
+          fetch('/api/categories/list'),
           fetch(`/api/subcategories/${params.id}`)
         ])
 
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json()
-          setCategories(categoriesData.allCategories || [])
+          setCategories(categoriesData.categories || [])
         }
 
         if (subcategoryResponse.ok) {

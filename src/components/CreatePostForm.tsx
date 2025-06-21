@@ -5,8 +5,16 @@ import { useRouter } from 'next/navigation'
 import RichTextEditor from './RichTextEditor'
 
 interface Category {
+  id: number
   name: string
   description?: string
+}
+
+interface Subcategory {
+  id: number
+  category_id: number
+  key: string
+  label: string
 }
 
 export default function CreatePostForm() {
@@ -21,61 +29,64 @@ export default function CreatePostForm() {
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
-  const [tagSuggestions, setTagSuggestions] = useState<string[]>([])
-  const [wordCount, setWordCount] = useState(0)
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([])
   const [isImporting, setIsImporting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const router = useRouter()
 
-  // 获取分类和标签建议
+  // 获取分类列表
   useEffect(() => {
     async function fetchData() {
       try {
-        // 获取分类
-        const categoriesRes = await fetch('/api/categories/list')
-        if (categoriesRes.ok) {
-          const categoriesData = await categoriesRes.json()
-          setCategories(categoriesData.categories || [])
-        }
-
-        // 获取热门标签
-        const tagsRes = await fetch('/api/tags')
-        if (tagsRes.ok) {
-          const tagsData = await tagsRes.json()
-          const popularTags = Object.keys(tagsData.tags || {})
-            .sort((a, b) => (tagsData.tags[b]?.total || 0) - (tagsData.tags[a]?.total || 0))
-            .slice(0, 10)
-          setTagSuggestions(popularTags)
+        const response = await fetch('/api/categories/list')
+        const data = await response.json()
+        if (response.ok) {
+          setCategories(data.categories || [])
         }
       } catch (error) {
-        console.error('获取数据失败:', error)
+        console.error('获取分类失败:', error)
       }
     }
     fetchData()
   }, [])
 
-  // 计算字数
+  // 获取二级分类列表
   useEffect(() => {
-    const plainText = content.replace(/[#*`\[\]()]/g, '').trim()
-    setWordCount(plainText.length)
-  }, [content])
+    async function fetchSubcategories() {
+      if (!category) {
+        setSubcategories([])
+        setSubcategory('')
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/subcategories?category=${encodeURIComponent(category)}`)
+        const data = await response.json()
+        if (response.ok) {
+          setSubcategories(data.subcategories || [])
+        } else {
+          setSubcategories([])
+        }
+      } catch (error) {
+        console.error('获取二级分类失败:', error)
+        setSubcategories([])
+      }
+    }
+    fetchSubcategories()
+  }, [category])
+
+  // 计算字数
+  const wordCount = content.replace(/<[^>]*>/g, '').length
 
   const generateSlug = (title: string) => {
-    let baseSlug = title
+    // 简化的slug生成逻辑
+    return title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-    
-    // 如果处理后的slug为空，使用默认前缀
-    if (!baseSlug) {
-      baseSlug = 'post'
-    }
-    
-    // 添加时间戳确保唯一性
-    const timestamp = Date.now().toString(36)
-    return `${baseSlug}-${timestamp}`
+      .replace(/[^\w\s-]/g, '') // 移除特殊字符
+      .replace(/[\s_-]+/g, '-') // 将空格和下划线替换为连字符
+      .replace(/^-+|-+$/g, '') // 移除开头和结尾的连字符
+      .substring(0, 50) // 限制长度
   }
 
   // 文件导入处理
@@ -85,6 +96,7 @@ export default function CreatePostForm() {
 
     setIsImporting(true)
     setError('')
+    setSuccessMessage('')
 
     try {
       const fileExtension = file.name.split('.').pop()?.toLowerCase()
@@ -97,7 +109,7 @@ export default function CreatePostForm() {
           break
         
         case 'txt':
-          // 最简单的方式：每行都独立显示，完全按原文件格式
+          // 保持原有的txt文件导入逻辑
           const textContent = await file.text()
           const lines = textContent.split('\n')
           importedContent = lines.map(line => {
@@ -148,7 +160,9 @@ export default function CreatePostForm() {
       }
 
       setContent(importedContent)
-      setSuccessMessage(`文件 "${file.name}" 导入成功！`)
+      if (!successMessage) {
+        setSuccessMessage(`文件 "${file.name}" 导入成功！`)
+      }
       setTimeout(() => setSuccessMessage(''), 3000)
 
     } catch (err) {
@@ -166,24 +180,6 @@ export default function CreatePostForm() {
     const tmp = document.createElement('div')
     tmp.innerHTML = html
     return tmp.textContent || tmp.innerText || ''
-  }
-
-  // 二级分类选项
-  const subcategoryOptions: Record<string, { key: string; label: string }[]> = {
-    '运维': [
-      { key: 'linux', label: 'linux基础' },
-      { key: 'log', label: '日志系统' },
-      { key: 'monitor', label: '监控系统' },
-      { key: 'trace', label: '链路系统' },
-      { key: 'db', label: '数据库' },
-    ],
-    '大数据': [
-      { key: 'hadoop', label: 'Hadoop' },
-      { key: 'spark', label: 'Spark' },
-      { key: 'flink', label: 'Flink' },
-      { key: 'hive', label: 'Hive' },
-      { key: 'kafka', label: 'Kafka' },
-    ],
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -376,7 +372,7 @@ export default function CreatePostForm() {
               </div>
 
               {/* 二级分类 */}
-              {category && subcategoryOptions[category] && (
+              {category && subcategories.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     二级分类
@@ -387,7 +383,7 @@ export default function CreatePostForm() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   >
                     <option value="">选择二级分类</option>
-                    {subcategoryOptions[category].map((sub) => (
+                    {subcategories.map((sub) => (
                       <option key={sub.key} value={sub.key}>{sub.label}</option>
                     ))}
                   </select>
@@ -408,18 +404,18 @@ export default function CreatePostForm() {
                 />
                 
                 {/* 标签建议 */}
-                {tagSuggestions.length > 0 && (
+                {subcategories.length > 0 && (
                   <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-2">热门标签：</p>
+                    <p className="text-xs text-gray-500 mb-2">二级分类：</p>
                     <div className="flex flex-wrap gap-2">
-                      {tagSuggestions.map((tag) => (
+                      {subcategories.map((sub) => (
                         <button
-                          key={tag}
+                          key={sub.key}
                           type="button"
-                          onClick={() => addTag(tag)}
+                          onClick={() => setSubcategory(sub.key)}
                           className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
                         >
-                          {tag}
+                          {sub.label}
                         </button>
                       ))}
                     </div>

@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createSupabaseServer()
     
-    // 先查询分类ID
+    // 先查询分类ID（使用name字段而不是slug）
     const { data: categoryData, error: categoryError } = await supabase
       .from('categories')
       .select('id')
-      .eq('slug', category)
+      .eq('name', category)
       .single()
 
     if (categoryError || !categoryData) {

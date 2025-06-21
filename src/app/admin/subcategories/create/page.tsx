@@ -33,10 +33,10 @@ export default function CreateSubcategory() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const categoriesResponse = await fetch('/api/categories')
+        const categoriesResponse = await fetch('/api/categories/list')
         if (categoriesResponse.ok) {
           const data = await categoriesResponse.json()
-          setCategories(data.allCategories || [])
+          setCategories(data.categories || [])
         } else {
           setError('获取分类列表失败')
         }

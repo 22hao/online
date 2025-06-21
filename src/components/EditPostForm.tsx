@@ -5,8 +5,16 @@ import { useRouter } from 'next/navigation'
 import RichTextEditor from './RichTextEditor'
 
 interface Category {
+  id: number
   name: string
   description?: string
+}
+
+interface Subcategory {
+  id: number
+  category_id: number
+  key: string
+  label: string
 }
 
 interface Post {
@@ -15,6 +23,7 @@ interface Post {
   content: string
   excerpt?: string
   category?: string
+  subcategory?: string
   tags?: string[]
   published: boolean
   slug: string
@@ -29,6 +38,7 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
   const [content, setContent] = useState(initialData.content)
   const [excerpt, setExcerpt] = useState(initialData.excerpt || '')
   const [category, setCategory] = useState(initialData.category || '')
+  const [subcategory, setSubcategory] = useState(initialData.subcategory || '')
   const [tags, setTags] = useState(initialData.tags?.join(', ') || '')
   const [isPublished, setIsPublished] = useState(initialData.published)
   const [isLoading, setIsLoading] = useState(false)
@@ -36,6 +46,7 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([])
   const [isImporting, setIsImporting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -56,6 +67,31 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
     }
     fetchCategories()
   }, [])
+
+  // 获取二级分类列表
+  useEffect(() => {
+    async function fetchSubcategories() {
+      if (!category) {
+        setSubcategories([])
+        setSubcategory('')
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/subcategories?category=${encodeURIComponent(category)}`)
+        const data = await response.json()
+        if (response.ok) {
+          setSubcategories(data.subcategories || [])
+        } else {
+          setSubcategories([])
+        }
+      } catch (error) {
+        console.error('获取二级分类失败:', error)
+        setSubcategories([])
+      }
+    }
+    fetchSubcategories()
+  }, [category])
 
   // 文件导入处理
   const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,6 +208,7 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
           content,
           excerpt: autoExcerpt,
           category: category || null,
+          subcategory: subcategory || null,
           tags: tagsArray.length > 0 ? tagsArray : null,
           published: isPublished,
         }),
@@ -288,6 +325,25 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
               {categories.map((cat) => (
                 <option key={cat.name} value={cat.name}>
                   {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="subcategory" className="block text-sm font-medium text-gray-700 mb-2">
+              二级分类
+            </label>
+            <select
+              id="subcategory"
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">选择二级分类</option>
+              {subcategories.map((subcat) => (
+                <option key={subcat.id} value={subcat.key}>
+                  {subcat.label}
                 </option>
               ))}
             </select>
