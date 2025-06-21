@@ -12,21 +12,21 @@ export async function GET() {
 
     const supabase = await createSupabaseServer()
     
-    // 从数据库获取真实的分类数据
+    // 从数据库获取真实的分类数据（不包含slug字段）
     const { data: categories, error } = await supabase
       .from('categories')
-      .select('id, name, slug, description')
+      .select('id, name, description')
       .order('id', { ascending: true })
 
     if (error) {
       console.error('获取分类失败:', error)
       // 如果查询失败，返回与实际数据库匹配的硬编码数据
       const mockCategories = [
-        { id: 6, name: '云原生', slug: 'cloudnative', description: '云原生技术' },
-        { id: 11, name: '大数据', slug: 'bigdata', description: '大数据技术' },
-        { id: 13, name: '安全', slug: 'security', description: '安全技术' },
-        { id: 14, name: '运维', slug: 'ops', description: '运维技术' },
-        { id: 15, name: '前端', slug: 'frontend', description: '前端技术' }
+        { id: 6, name: '云原生', description: '云原生技术' },
+        { id: 11, name: '大数据', description: '大数据技术' },
+        { id: 13, name: '安全', description: '安全技术' },
+        { id: 14, name: '运维', description: '运维技术' },
+        { id: 15, name: '前端', description: '前端技术' }
       ]
       
       const result = mockCategories.reduce((acc, category) => {
@@ -187,4 +187,4 @@ export async function DELETE(request: Request) {
     console.error('删除分类失败:', error)
     return NextResponse.json({ error: '删除分类失败' }, { status: 500 })
   }
-} 
+}
