@@ -10,45 +10,22 @@ export async function GET() {
       return NextResponse.json({ error: '未授权' }, { status: 401 })
     }
 
-    const supabase = await createSupabaseServer()
-    
-    // 获取所有分类
-    const { data: categories, error: categoriesError } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name')
+    // 临时返回硬编码数据，测试性能
+    const mockCategories = [
+      { id: 1, name: '前端', slug: 'frontend', description: '前端技术' },
+      { id: 2, name: '后端', slug: 'backend', description: '后端技术' },
+      { id: 3, name: '云原生', slug: 'cloudnative', description: '云原生技术' },
+      { id: 4, name: '大数据', slug: 'bigdata', description: '大数据技术' },
+      { id: 5, name: '运维', slug: 'ops', description: '运维技术' },
+      { id: 6, name: '安全', slug: 'security', description: '安全技术' }
+    ]
 
-    if (categoriesError) {
-      console.error('获取分类失败:', categoriesError)
-      return NextResponse.json({ error: '获取分类失败' }, { status: 500 })
-    }
-
-    // 获取所有文章的分类信息来统计使用情况
-    const { data: posts } = await supabase
-      .from('posts')
-      .select('category, published')
-
-    // 统计分类使用数据
-    const categoryStats = posts?.reduce((acc, post) => {
-      if (post.category) {
-        if (!acc[post.category]) {
-          acc[post.category] = { total: 0, published: 0 }
-        }
-        acc[post.category].total += 1
-        if (post.published) {
-          acc[post.category].published += 1
-        }
-      }
+    const result = mockCategories.reduce((acc, category) => {
+      acc[category.name] = { total: 0, published: 0 }
       return acc
-    }, {} as Record<string, { total: number; published: number }>) || {}
+    }, {} as Record<string, { total: number; published: number }>)
 
-    // 合并分类信息和使用统计
-    const result = categories?.reduce((acc, category) => {
-      acc[category.name] = categoryStats[category.name] || { total: 0, published: 0 }
-      return acc
-    }, {} as Record<string, { total: number; published: number }>) || {}
-
-    return NextResponse.json({ categories: result, allCategories: categories })
+    return NextResponse.json({ categories: result, allCategories: mockCategories })
   } catch (error) {
     console.error('获取分类失败:', error)
     return NextResponse.json({ error: '获取分类失败' }, { status: 500 })

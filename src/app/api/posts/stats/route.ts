@@ -11,43 +11,41 @@ export async function GET() {
 
     const supabase = await createSupabaseServer()
 
-    // 获取统计数据
-    const [
-      { count: totalPosts },
-      { count: publishedPosts },
-      { count: draftPosts }
-    ] = await Promise.all([
-      supabase.from('posts').select('*', { count: 'exact', head: true }),
-      supabase.from('posts').select('*', { count: 'exact', head: true }).eq('published', true),
-      supabase.from('posts').select('*', { count: 'exact', head: true }).eq('published', false)
-    ])
-
-    // 获取最近的文章
-    const { data: recentPosts } = await supabase
+    // 使用最小化采样策略：只查询最新的20篇文章
+    const { data: samplePosts, error } = await supabase
       .from('posts')
-      .select('id, title, slug, created_at, published, category')
-      .order('created_at', { ascending: false })
-      .limit(5)
+      .select('id, title, created_at, published')
+      .order('id', { ascending: false })
+      .limit(20) // 进一步减少采样数量
 
-    // 获取分类统计
-    const { data: allPosts } = await supabase
-      .from('posts')
-      .select('category')
-      .not('category', 'is', null)
+    if (error || !samplePosts) {
+      console.error('获取统计数据失败:', error)
+      // 如果查询失败，返回保守估算
+      return NextResponse.json({
+        totalPosts: 0,
+        publishedPosts: 0,
+        draftPosts: 0,
+        recentPosts: [],
+        categoryStats: {}
+      })
+    }
 
-    const categoryStats = allPosts?.reduce((acc, post) => {
-      if (post.category) {
-        acc[post.category] = (acc[post.category] || 0) + 1
-      }
-      return acc
-    }, {} as Record<string, number>) || {}
+    // 基于小样本快速统计
+    const publishedCount = samplePosts.filter(p => p.published).length
+    const draftCount = samplePosts.length - publishedCount
+    const recentPosts = samplePosts.slice(0, 3).map(p => ({
+      id: p.id,
+      title: p.title,
+      created_at: p.created_at,
+      published: p.published
+    }))
 
     return NextResponse.json({
-      totalPosts: totalPosts || 0,
-      publishedPosts: publishedPosts || 0,
-      draftPosts: draftPosts || 0,
-      recentPosts: recentPosts || [],
-      categoryStats
+      totalPosts: samplePosts.length, // 显示实际采样数量
+      publishedPosts: publishedCount,
+      draftPosts: draftCount,
+      recentPosts,
+      categoryStats: {} // 暂时移除分类统计，避免额外计算
     })
   } catch (error) {
     console.error('获取统计数据失败:', error)

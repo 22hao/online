@@ -24,42 +24,30 @@ export default function AdminSubcategories() {
   const [success, setSuccess] = useState('')
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null)
 
-  // 获取数据
+  // 优化数据获取：并行获取，避免循环调用
   const fetchData = async () => {
     try {
       setLoading(true)
       
-      // 先获取分类列表
-      const categoriesResponse = await fetch('/api/categories')
-      let categoriesData: Category[] = []
-      
+      // 并行获取分类和二级分类数据
+      const [categoriesResponse, subcategoriesResponse] = await Promise.all([
+        fetch('/api/categories'),
+        fetch('/api/subcategories/list')
+      ])
+
+      // 处理分类数据
       if (categoriesResponse.ok) {
         const data = await categoriesResponse.json()
-        categoriesData = data.allCategories || []
-        setCategories(categoriesData)
+        setCategories(data.allCategories || [])
       }
 
-      // 尝试获取所有二级分类
-      const subcategoriesResponse = await fetch('/api/subcategories/list')
-      
+      // 处理二级分类数据
       if (subcategoriesResponse.ok) {
         const subcategoriesData = await subcategoriesResponse.json()
         setSubcategories(subcategoriesData.subcategories || [])
       } else {
-        // 如果列表端点不可用，使用临时方案：通过每个分类获取
-        const allSubcategories: Subcategory[] = []
-        for (const category of categoriesData) {
-          try {
-            const response = await fetch(`/api/subcategories?category=${encodeURIComponent(category.name)}`)
-            if (response.ok) {
-              const data = await response.json()
-              allSubcategories.push(...(data.subcategories || []))
-            }
-          } catch (error) {
-            console.error(`获取 ${category.name} 的二级分类失败:`, error)
-          }
-        }
-        setSubcategories(allSubcategories)
+        console.error('获取二级分类失败')
+        setError('获取二级分类失败')
       }
     } catch (error) {
       console.error('获取数据失败:', error)
@@ -108,9 +96,7 @@ export default function AdminSubcategories() {
   }
 
   const getCategoryName = (categoryId: number) => {
-    // 添加类型检查，确保categories是数组
     if (!Array.isArray(categories)) {
-      console.error('categories不是数组:', categories)
       return '未知分类'
     }
     
@@ -198,14 +184,14 @@ export default function AdminSubcategories() {
                       <div className="flex items-center gap-3">
                         <Link 
                           href={`/admin/subcategories/edit/${sub.id}`} 
-                          className="text-blue-600 hover:text-blue-900 transition-colors"
+                          className="text-blue-600 hover:text-blue-900"
                         >
                           编辑
                         </Link>
                         <button
                           onClick={() => handleDelete(sub.id, sub.label)}
                           disabled={deleteLoading === sub.id}
-                          className="text-red-600 hover:text-red-900 transition-colors disabled:opacity-50"
+                          className={`text-red-600 hover:text-red-900 ${deleteLoading === sub.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           {deleteLoading === sub.id ? '删除中...' : '删除'}
                         </button>
@@ -217,12 +203,6 @@ export default function AdminSubcategories() {
             </tbody>
           </table>
         </div>
-
-        {subcategories.length > 0 && (
-          <div className="text-sm text-gray-500 text-center">
-            共 {subcategories.length} 个二级分类
-          </div>
-        )}
       </div>
     </AdminLayout>
   )

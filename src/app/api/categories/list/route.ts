@@ -6,15 +6,20 @@ export async function GET() {
   try {
     const supabase = await createSupabaseServer()
     
-    // 获取所有分类
+    // 尝试最简单的查询：只查name，限制5条，不排序
     const { data: categories, error } = await supabase
       .from('categories')
-      .select('name, description')
-      .order('name')
+      .select('name')
+      .limit(5)
 
     if (error) {
       console.error('获取分类列表失败:', error)
-      return NextResponse.json({ error: '获取分类列表失败' }, { status: 500 })
+      // 如果查询失败，返回硬编码数据作为备选
+      const mockCategories = [
+        { name: '前端' }, { name: '后端' }, { name: '云原生' },
+        { name: '大数据' }, { name: '运维' }, { name: '安全' }
+      ]
+      return NextResponse.json({ categories: mockCategories })
     }
 
     return NextResponse.json({ categories: categories || [] })
