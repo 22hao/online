@@ -110,7 +110,28 @@ export default function CreatePostForm() {
         
         case 'doc':
         case 'docx':
-          throw new Error('Word 文档导入功能暂时不可用，请使用 Markdown 或文本文件')
+          // 使用API处理Word文档
+          const formData = new FormData()
+          formData.append('file', file)
+          
+          const response = await fetch('/api/import/word', {
+            method: 'POST',
+            body: formData,
+          })
+          
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Word文档导入失败')
+          }
+          
+          const result = await response.json()
+          importedContent = result.content
+          
+          // 如果有警告信息，显示给用户
+          if (result.warnings && result.warnings.length > 0) {
+            console.warn('Word导入警告:', result.warnings)
+            setSuccessMessage(`文件 "${file.name}" 导入成功！注意：${result.warnings.join(', ')}`)
+          }
           break
         
         default:

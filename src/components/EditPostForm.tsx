@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import RichTextEditor from './RichTextEditor'
 
@@ -34,7 +34,10 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
+  const [isImporting, setIsImporting] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const router = useRouter()
 
@@ -53,6 +56,92 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
     }
     fetchCategories()
   }, [])
+
+  // 文件导入处理
+  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setIsImporting(true)
+    setError('')
+    setSuccessMessage('')
+
+    try {
+      const fileExtension = file.name.split('.').pop()?.toLowerCase()
+      let importedContent = ''
+
+      switch (fileExtension) {
+        case 'md':
+        case 'markdown':
+          importedContent = await file.text()
+          break
+        
+        case 'txt':
+          // 保持原有的txt文件导入逻辑
+          const textContent = await file.text()
+          const lines = textContent.split('\n')
+          importedContent = lines.map(line => {
+            if (line.trim() === '') {
+              return '<div><br></div>' // 空行保持为空行
+            }
+            return `<div>${line}</div>` // 每行独立显示
+          }).join('')
+          break
+        
+        case 'doc':
+        case 'docx':
+          // 使用API处理Word文档
+          const formData = new FormData()
+          formData.append('file', file)
+          
+          const response = await fetch('/api/import/word', {
+            method: 'POST',
+            body: formData,
+          })
+          
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Word文档导入失败')
+          }
+          
+          const result = await response.json()
+          importedContent = result.content
+          
+          // 如果有警告信息，显示给用户
+          if (result.warnings && result.warnings.length > 0) {
+            console.warn('Word导入警告:', result.warnings)
+            setSuccessMessage(`文件 "${file.name}" 导入成功！注意：${result.warnings.join(', ')}`)
+          }
+          break
+        
+        default:
+          throw new Error('不支持的文件格式，请选择 .md, .txt, .doc 或 .docx 文件')
+      }
+
+      // 如果没有标题，尝试从内容中提取
+      if (!title.trim()) {
+        const firstLine = importedContent.split('\n')[0]
+        if (firstLine.startsWith('#')) {
+          setTitle(firstLine.replace(/^#+\s*/, ''))
+          importedContent = importedContent.split('\n').slice(1).join('\n').trim()
+        }
+      }
+
+      setContent(importedContent)
+      if (!successMessage) {
+        setSuccessMessage(`文件 "${file.name}" 导入成功！`)
+      }
+      setTimeout(() => setSuccessMessage(''), 3000)
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '文件导入失败')
+    } finally {
+      setIsImporting(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
 
   // 清理HTML标签的函数
   const stripHtmlTags = (html: string) => {
@@ -135,9 +224,19 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
 
   return (
     <>
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800">{error}</p>
+      {/* 消息提示 */}
+      {(error || successMessage) && (
+        <div className="mb-6">
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800">{error}</p>
+            </div>
+          )}
+          {successMessage && (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-800">{successMessage}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -211,9 +310,31 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
 
         {/* 富文本编辑器 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            文章内容 *
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              文章内容 *
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileImport}
+                accept=".md,.markdown,.txt,.doc,.docx"
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isImporting}
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isImporting ? '导入中...' : '📁 导入文件'}
+              </button>
+              <span className="text-xs text-gray-500">
+                支持 .md/.txt/.doc/.docx
+              </span>
+            </div>
+          </div>
           <RichTextEditor
             value={content}
             onChange={setContent}

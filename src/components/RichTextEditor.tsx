@@ -19,11 +19,11 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
   const [editorMode, setEditorMode] = useState<'rich' | 'markdown'>('rich') // 默认富文本模式
   const [contentWarning, setContentWarning] = useState('')
 
-  // 内容长度检查 (HTML格式需要更高限制)
+  // 内容长度检查 (大幅提高限制，支持Word文档导入)
   useEffect(() => {
-    if (value && value.length > 300000) {
+    if (value && value.length > 1000000) {
       setContentWarning('内容过长，可能影响编辑器性能')
-    } else if (value && value.length > 600000) {
+    } else if (value && value.length > 5000000) {
       setContentWarning('内容严重超长，请考虑分段发布')
     } else {
       setContentWarning('')
@@ -133,10 +133,10 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
 
   // 安全的onChange处理
   const handleContentChange = (newValue: string) => {
-    // 如果内容过长，截断并显示警告 (支持HTML格式的更高限制)
-    if (newValue && newValue.length > 1000000) {
-      const truncated = newValue.substring(0, 1000000)
-      setContentWarning('内容已自动截断至100万字符，避免浏览器卡死')
+    // 如果内容过长，截断并显示警告 (大幅提高限制支持Word导入)
+    if (newValue && newValue.length > 10000000) {
+      const truncated = newValue.substring(0, 10000000)
+      setContentWarning('内容已自动截断至1000万字符，避免浏览器卡死')
       onChange(truncated)
     } else {
       onChange(newValue)
@@ -278,6 +278,54 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         .ql-editor {
           font-family: "SimSun", "宋体", serif !important;
           font-size: 16px !important;
+        }
+
+        /* Word导入表格样式 */
+        .ql-editor table.word-table {
+          border-collapse: collapse !important;
+          width: 100% !important;
+          margin: 16px 0 !important;
+          border: 1px solid #ddd !important;
+        }
+        .ql-editor table.word-table td,
+        .ql-editor table.word-table th {
+          border: 1px solid #ddd !important;
+          padding: 8px 12px !important;
+          text-align: left !important;
+          vertical-align: top !important;
+        }
+        .ql-editor table.word-table th {
+          background-color: #f5f5f5 !important;
+          font-weight: bold !important;
+        }
+        .ql-editor table.word-table tr:nth-child(even) {
+          background-color: #f9f9f9 !important;
+        }
+        
+        /* Word导入图片样式 */
+        .ql-editor img {
+          max-width: 100% !important;
+          height: auto !important;
+          margin: 16px 0 !important;
+          border-radius: 4px !important;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+        
+        /* Word导入段落间距优化 */
+        .ql-editor p {
+          margin: 8px 0 !important;
+          line-height: 1.6 !important;
+        }
+        .ql-editor br {
+          line-height: 1.6 !important;
+        }
+        
+        /* Word导入标题样式 */
+        .ql-editor h1, .ql-editor h2, .ql-editor h3, 
+        .ql-editor h4, .ql-editor h5, .ql-editor h6 {
+          margin: 24px 0 16px 0 !important;
+          line-height: 1.3 !important;
+          font-weight: bold !important;
         }
 
         /* MD编辑器优化样式 */
