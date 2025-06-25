@@ -81,12 +81,16 @@ export default function CreatePostForm() {
 
   const generateSlug = (title: string) => {
     // 简化的slug生成逻辑
-    return title
+    const baseSlug = title
       .toLowerCase()
       .replace(/[^\w\s-]/g, '') // 移除特殊字符
       .replace(/[\s_-]+/g, '-') // 将空格和下划线替换为连字符
       .replace(/^-+|-+$/g, '') // 移除开头和结尾的连字符
       .substring(0, 50) // 限制长度
+    
+    // 添加时间戳确保唯一性
+    const timestamp = Date.now().toString(36)
+    return `${baseSlug}-${timestamp}`
   }
 
   // 文件导入处理

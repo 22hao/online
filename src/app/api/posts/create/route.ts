@@ -24,12 +24,26 @@ export async function POST(request: Request) {
       )
     }
 
-    console.log('创建文章，接收到的数据:', { title, category, subcategory, published })
+    console.log('创建文章，接收到的数据:', { title, category, subcategory, published, slug })
 
     const supabase = await createSupabaseAdmin()
     
     // 使用固定的管理员UUID
     const adminId = 'a0000000-b000-4000-8000-000000000001'
+
+    // 检查slug是否重复，如果重复则添加时间戳
+    let finalSlug = slug
+    const { data: existingPost } = await supabase
+      .from('posts')
+      .select('id')
+      .eq('slug', slug)
+      .single()
+
+    if (existingPost) {
+      const timestamp = Date.now().toString(36)
+      finalSlug = `${slug}-${timestamp}`
+      console.log(`Slug重复，生成新的slug: ${finalSlug}`)
+    }
 
     const { data, error } = await supabase
       .from('posts')
@@ -42,7 +56,7 @@ export async function POST(request: Request) {
         tags: tags || null,
         author_id: adminId,
         published: published || false,
-        slug,
+        slug: finalSlug,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
@@ -65,4 +79,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-} 
+}
