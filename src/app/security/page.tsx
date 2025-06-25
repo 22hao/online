@@ -1,18 +1,20 @@
-import { getArticlesByCategoryAndSub } from '@/lib/article';
-import { getSubcategoriesByCategory } from '@/lib/categories';
-import CategoryPage from '@/components/CategoryPage';
+import { getArticlesByCategoryWithPagination } from '@/lib/article';
+import SimpleCategoryPage from '@/components/SimpleCategoryPage';
 
-export default async function SecurityPage({ searchParams }: { searchParams: { sub?: string } }) {
-  const currentSub = searchParams?.sub || '';
-  const subcategories = await getSubcategoriesByCategory('安全');
-  const articles = await getArticlesByCategoryAndSub('安全', currentSub);
+export default async function SecurityPage({ searchParams }: { searchParams: { page?: string } }) {
+  const currentPage = parseInt(searchParams?.page || '1', 10);
+  const pageSize = 9;
+  
+  const { articles, totalCount } = await getArticlesByCategoryWithPagination('安全', currentPage, pageSize);
 
   return (
-    <CategoryPage
+    <SimpleCategoryPage
       category="security"
-      subcategories={subcategories}
-      currentSub={currentSub}
+      categoryTitle="安全"
       articles={articles}
+      totalCount={totalCount}
+      currentPage={currentPage}
+      pageSize={pageSize}
     />
   );
 } 

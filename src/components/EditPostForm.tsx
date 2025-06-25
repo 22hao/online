@@ -77,6 +77,13 @@ export default function EditPostForm({ initialData }: EditPostFormProps) {
         return
       }
 
+      // 对于大数据、前端、安全分类，不显示二级分类
+      if (['大数据', '前端', '安全'].includes(category)) {
+        setSubcategories([])
+        setSubcategory('')
+        return
+      }
+
       try {
         const response = await fetch(`/api/subcategories?category=${encodeURIComponent(category)}`)
         const data = await response.json()

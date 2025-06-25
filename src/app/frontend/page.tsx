@@ -1,18 +1,20 @@
-import { getArticlesByCategoryAndSub } from '@/lib/article';
-import { getSubcategoriesByCategory } from '@/lib/categories';
-import CategoryPage from '@/components/CategoryPage';
+import { getArticlesByCategoryWithPagination } from '@/lib/article';
+import SimpleCategoryPage from '@/components/SimpleCategoryPage';
 
-export default async function FrontendPage({ searchParams }: { searchParams: { sub?: string } }) {
-  const currentSub = searchParams?.sub || '';
-  const subcategories = await getSubcategoriesByCategory('前端');
-  const articles = await getArticlesByCategoryAndSub('前端', currentSub);
+export default async function FrontendPage({ searchParams }: { searchParams: { page?: string } }) {
+  const currentPage = parseInt(searchParams?.page || '1', 10);
+  const pageSize = 9;
+  
+  const { articles, totalCount } = await getArticlesByCategoryWithPagination('前端', currentPage, pageSize);
 
   return (
-    <CategoryPage
+    <SimpleCategoryPage
       category="frontend"
-      subcategories={subcategories}
-      currentSub={currentSub}
+      categoryTitle="前端"
       articles={articles}
+      totalCount={totalCount}
+      currentPage={currentPage}
+      pageSize={pageSize}
     />
   );
 } 
