@@ -143,14 +143,14 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
                   ${getLevelStyles(item.level)}
                 `}
               >
-                {/* 层级指示器 */}
-                {item.level > 1 && (
-                  <span className="inline-block w-1 h-1 bg-gray-400 rounded-full mr-2 group-hover:bg-blue-400 transition-colors"></span>
-                )}
-                
-                {/* 标题文本 */}
-                <span className="block leading-tight">
-                  {item.text}
+                {/* 层级指示器和标题文本在同一行 */}
+                <span className="flex items-center leading-tight">
+                  {item.level > 1 && (
+                    <span className="inline-block w-1 h-1 bg-gray-400 rounded-full mr-2 group-hover:bg-blue-400 transition-colors flex-shrink-0"></span>
+                  )}
+                  <span className="truncate">
+                    {item.text}
+                  </span>
                 </span>
               </button>
             </div>
