@@ -55,90 +55,169 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-16 px-8">
-      <div className="flex gap-8">
-        {/* 主要内容区域 */}
-        <article className="flex-1 max-w-4xl">
-          {/* 文章头部 */}
-          <header className="mb-12">
-            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-              <Link href="/posts" className="hover:text-blue-600">
-                ← 返回文章列表
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex gap-6 px-4 py-8">
+          {/* 主要内容区域 */}
+          <article className="flex-1 max-w-none">
+            {/* 顶部导航 */}
+            <div className="flex items-center justify-between mb-6">
+              <Link 
+                href="/posts" 
+                className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors group"
+              >
+                <svg className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                返回文章列表
               </Link>
               {adminInfo && (
                 <Link
                   href={`/posts/edit/${slug}`}
-                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-xl hover:bg-blue-700 transition-all hover:shadow-lg"
                 >
-                  ✏️ 编辑文章
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  编辑文章
                 </Link>
               )}
             </div>
             
-            <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
-              {post.title}
-            </h1>
-            
-            {post.excerpt && (
-              <p className="text-xl text-gray-600 mb-6 leading-relaxed">
-                {post.excerpt}
-              </p>
-            )}
+            {/* 文章头部 - 优化版 */}
+            <header className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                {post.title}
+              </h1>
+              
+              {post.excerpt && (
+                <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+                  {post.excerpt}
+                </p>
+              )}
 
-            <div className="flex items-center justify-between pb-6 border-b border-gray-200">
-              <div className="flex items-center space-x-4">
-                <div>
-                  <div className="font-medium text-gray-900">管理员</div>
-                  <div className="text-sm text-gray-500">
-                    {new Date(post.created_at).toLocaleDateString('zh-CN', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                    {post.updated_at !== post.created_at && (
-                      <span className="ml-2">
-                        · 更新于 {new Date(post.updated_at).toLocaleDateString('zh-CN')}
-                      </span>
-                    )}
+              {/* 文章元信息 */}
+              <div className="flex flex-wrap items-center gap-4 pb-4 border-b border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-medium text-xs">管</span>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900 text-sm">管理员</div>
+                    <div className="text-xs text-gray-500 flex items-center">
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {new Date(post.created_at).toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                      {post.updated_at !== post.created_at && (
+                        <span className="ml-2 text-orange-500">
+                          · 已更新
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                {/* 分类 */}
+                
+                {/* 分类标签 */}
                 {post.category && (
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-lg">
-                    📂 {post.category}
+                  <div className="flex items-center">
+                    <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 text-xs rounded-full font-medium">
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                      {post.category}
+                    </span>
+                  </div>
+                )}
+
+                {/* 子分类 */}
+                {post.subcategory && (
+                  <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                    {post.subcategory}
                   </span>
                 )}
               </div>
-            </div>
 
-            {/* 标签 */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                {post.tags.map((tag: string) => (
-                  <span 
-                    key={tag}
-                    className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                  >
-                    #{tag}
-                  </span>
-                ))}
+              {/* 标签云 */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {post.tags.map((tag: string) => (
+                    <span 
+                      key={tag}
+                      className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 text-xs rounded-full hover:from-blue-100 hover:to-indigo-100 transition-colors cursor-default"
+                    >
+                      <span className="text-blue-400 mr-1">#</span>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </header>
+
+            {/* 文章内容 - 优化版 */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className="prose prose-base max-w-none 
+                prose-headings:text-gray-900 prose-headings:font-bold
+                prose-h1:text-2xl prose-h1:mb-4 prose-h1:border-b prose-h1:border-gray-200 prose-h1:pb-3
+                prose-h2:text-xl prose-h2:mb-3 prose-h2:mt-6 prose-h2:text-blue-900
+                prose-h3:text-lg prose-h3:mb-2 prose-h3:mt-4 prose-h3:text-gray-800
+                prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-3
+                prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+                prose-code:text-pink-600 prose-code:bg-pink-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                prose-pre:bg-gray-900 prose-pre:border prose-pre:border-gray-700
+                prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:italic
+                prose-table:border-collapse prose-th:bg-gray-50 prose-th:border prose-th:border-gray-300 prose-th:p-2
+                prose-td:border prose-td:border-gray-300 prose-td:p-2
+                prose-ol:list-decimal prose-ul:list-disc prose-li:mb-1
+                prose-strong:text-gray-900 prose-strong:font-semibold
+                prose-img:rounded-lg prose-img:shadow-md">
+                <ContentRenderer content={post.content} />
               </div>
-            )}
-          </header>
 
-          {/* 文章内容 */}
-          <div className="prose prose-lg max-w-none">
-            <ContentRenderer content={post.content} />
-          </div>
-        </article>
+              {/* 文章底部操作 */}
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-500">
+                    最后更新于 {new Date(post.updated_at).toLocaleDateString('zh-CN')}
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <button className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      喜欢
+                    </button>
+                    <button className="inline-flex items-center text-sm text-gray-600 hover:text-green-600 transition-colors">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                      </svg>
+                      分享
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
 
-        {/* 右侧目录大纲 */}
-        <aside className="hidden lg:block w-64 flex-shrink-0">
-          <TableOfContents content={post.content} />
-        </aside>
+          {/* 右侧目录大纲 - 精简版 */}
+          <aside className="hidden lg:block w-56 flex-shrink-0">
+            <div className="sticky top-8">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  目录大纲
+                </h3>
+                <TableOfContents content={post.content} />
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   )

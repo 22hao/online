@@ -34,6 +34,14 @@ body {
 .prose :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   margin-top: 1.25em;
   margin-bottom: 1.25em;
+  line-height: 1.7;
+}
+
+/* 修复空段落显示 */
+.prose :where(p):empty {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  min-height: 1.25em;
 }
 
 .prose :where([class~="lead"]):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
@@ -203,4 +211,556 @@ body {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+/* 增强prose样式以支持HTML内容 */
+
+/* 修复段落样式 */
+.prose :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  line-height: 1.7;
+}
+
+/* 修复空段落显示 */
+.prose :where(p):empty {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  min-height: 1.25em;
+}
+
+/* 增强表格样式 */
+.prose :where(table):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-collapse: collapse;
+  border: 1px solid var(--tw-prose-th-borders);
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.prose :where(thead):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: rgb(249 250 251);
+}
+
+.prose :where(th):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--tw-prose-headings);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.5714286em;
+  border-bottom: 1px solid var(--tw-prose-th-borders);
+  border-right: 1px solid var(--tw-prose-th-borders);
+}
+
+.prose :where(th:last-child):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-right: none;
+}
+
+.prose :where(td):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  text-align: left;
+  padding: 0.5714286em;
+  border-bottom: 1px solid var(--tw-prose-td-borders);
+  border-right: 1px solid var(--tw-prose-td-borders);
+}
+
+.prose :where(td:last-child):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-right: none;
+}
+
+.prose :where(tbody tr:last-child td):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-bottom: none;
+}
+
+/* 增强表格样式类 */
+.prose .prose-table {
+  border: 1px solid var(--tw-prose-th-borders);
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+/* 增强blockquote样式 */
+.prose .prose-blockquote {
+  background-color: rgb(249 250 251);
+  border-radius: 0.375rem;
+  padding: 1em 1.5em;
+}
+
+/* 增强内联代码样式 */
+.prose :where(:not(pre) > code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--tw-prose-code);
+  font-weight: 600;
+  font-size: 0.875em;
+  background-color: rgb(249 250 251);
+  padding: 0.125em 0.375em;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(229 231 235);
+}
+
+/* 修复div标签转换的段落 */
+.prose :where(div):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  line-height: 1.7;
+}
+
+/* prose-lg增强样式 */
+.prose-lg :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  margin-top: 1.3333333em;
+  margin-bottom: 1.3333333em;
+  line-height: 1.7777778;
+}
+
+.prose-lg :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  font-size: 2.6666667em;
+  margin-top: 0;
+  margin-bottom: 0.8333333em;
+  line-height: 1;
+}
+
+.prose-lg :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  font-size: 1.6666667em;
+  margin-top: 1.8666667em;
+  margin-bottom: 1.0666667em;
+  line-height: 1.3333333;
+}
+
+.prose-lg :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  font-size: 1.3333333em;
+  margin-top: 1.6666667em;
+  margin-bottom: 0.6666667em;
+  line-height: 1.5;
+}
+
+/* Enhanced CSS Variables for prose styling */
+.prose {
+  --tw-prose-body: rgb(55 65 81);
+  --tw-prose-headings: rgb(17 24 39);
+  --tw-prose-lead: rgb(75 85 99);
+  --tw-prose-links: rgb(37 99 235);
+  --tw-prose-bold: rgb(17 24 39);
+  --tw-prose-counters: rgb(75 85 99);
+  --tw-prose-bullets: rgb(209 213 219);
+  --tw-prose-hr: rgb(229 231 235);
+  --tw-prose-quotes: rgb(17 24 39);
+  --tw-prose-quote-borders: rgb(37 99 235);
+  --tw-prose-captions: rgb(75 85 99);
+  --tw-prose-code: rgb(219 39 119);
+  --tw-prose-pre-code: rgb(229 231 235);
+  --tw-prose-pre-bg: rgb(17 24 39);
+  --tw-prose-th-borders: rgb(209 213 219);
+  --tw-prose-td-borders: rgb(229 231 235);
+}
+
+.prose-lg {
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+/* Enhanced table styling */
+.prose :where(table):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid rgb(229 231 235);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.prose :where(thead):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: rgb(249 250 251);
+}
+
+.prose :where(th):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-bottom: 1px solid rgb(209 213 219);
+  border-right: 1px solid rgb(229 231 235);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: rgb(17 24 39);
+}
+
+.prose :where(th):last-child:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-right: none;
+}
+
+.prose :where(td):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-bottom: 1px solid rgb(229 231 235);
+  border-right: 1px solid rgb(229 231 235);
+  padding: 0.75rem 1rem;
+  color: rgb(55 65 81);
+}
+
+.prose :where(td):last-child:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-right: none;
+}
+
+.prose :where(tr):last-child td:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-bottom: none;
+}
+
+.prose :where(tr):hover td:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: rgb(249 250 251);
+}
+
+/* Enhanced blockquote styling */
+.prose :where(blockquote):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: rgb(239 246 255);
+  border-left: 4px solid rgb(37 99 235);
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 1rem 1.5rem;
+  position: relative;
+}
+
+.prose :where(blockquote):before:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  content: '"';
+  font-size: 3rem;
+  color: rgb(37 99 235);
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+  opacity: 0.3;
+}
+
+/* Enhanced heading styles with better spacing */
+.prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-bottom: 3px solid rgb(229 231 235);
+  padding-bottom: 0.5rem;
+}
+
+.prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: rgb(30 58 138);
+  position: relative;
+}
+
+.prose :where(h2):before:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 1.5rem;
+  background: linear-gradient(to bottom, rgb(37 99 235), rgb(79 70 229));
+  border-radius: 2px;
+}
+
+.prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: rgb(55 65 81);
+  position: relative;
+}
+
+.prose :where(h3):before:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  content: '▸';
+  color: rgb(37 99 235);
+  margin-right: 0.5rem;
+  font-weight: bold;
+}
+
+/* Enhanced code blocks - disable for enhanced-code-block */
+.prose :where(pre):not(.enhanced-code-block pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border: 1px solid rgb(55 65 81);
+  position: relative;
+}
+
+.prose :where(pre):not(.enhanced-code-block pre):before:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, rgb(37 99 235), rgb(79 70 229), rgb(219 39 119));
+}
+
+/* Enhanced list styling */
+.prose :where(ul > li):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.prose :where(ul > li):before:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  content: '•';
+  color: rgb(37 99 235);
+  font-weight: bold;
+  position: absolute;
+  left: -1rem;
+}
+
+.prose :where(ol > li):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+/* Enhanced link styling */
+.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  text-decoration: none;
+  background: linear-gradient(to right, rgb(37 99 235), rgb(79 70 229));
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease;
+}
+
+.prose :where(a):hover:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-size: 100% 2px;
+}
+
+/* Clean Code Block Styling - Optimized */
+.enhanced-code-block {
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  border: 1px solid #e1e4e8;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #e1e4e8;
+  font-size: 12px;
+}
+
+.language-badge {
+  color: #586069;
+  font-weight: 500;
+  text-transform: lowercase;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #ffffff;
+  color: #586069;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.copy-btn:hover {
+  background: #f3f4f6;
+  border-color: #8b949e;
+  color: #24292f;
+}
+
+.copy-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.enhanced-code-block .code-content,
+.enhanced-code-block pre {
+  margin: 0 !important;
+  padding: 16px !important;
+  background: #f6f8fa !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+.enhanced-code-block code {
+  background: transparent !important;
+  color: #24292f !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: 400 !important;
+  white-space: pre;
+}
+
+/* Inline Code Styling */
+.enhanced-inline-code {
+  padding: 0.2em 0.4em !important;
+  background: #f3f4f6 !important;
+  color: #24292f !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 85% !important;
+  border-radius: 4px !important;
+  border: none !important;
+  font-weight: 400 !important;
+}
+
+/* Scrollbar for code blocks */
+.enhanced-code-block pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.enhanced-code-block pre::-webkit-scrollbar-track {
+  background: #f6f8fa;
+}
+
+.enhanced-code-block pre::-webkit-scrollbar-thumb {
+  background: #d0d7de;
+  border-radius: 3px;
+}
+
+.enhanced-code-block pre::-webkit-scrollbar-thumb:hover {
+  background: #8b949e;
+}
+
+/* Reset conflicting prose styles */
+.prose .enhanced-code-block {
+  margin: 1.5rem 0 !important;
+}
+
+.prose .enhanced-code-block pre {
+  margin: 0 !important;
+  padding: 16px !important;
+  background: #f6f8fa !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.prose .enhanced-code-block code {
+  background: transparent !important;
+  color: #24292f !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Standard prose code blocks fallback */
+.prose :where(pre):not(.enhanced-code-block pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: #f6f8fa !important;
+  border: 1px solid #e1e4e8 !important;
+  border-radius: 8px !important;
+  color: #24292f !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+/* Standard prose inline code fallback */
+.prose :where(:not(pre) > code):not(.enhanced-inline-code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: #f3f4f6 !important;
+  color: #24292f !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 4px !important;
+  border: none !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 85% !important;
+  font-weight: 400 !important;
+}
+
+/* 修复HTML内容渲染问题 */
+.prose p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  line-height: 1.6;
+}
+
+.prose p:empty {
+  margin: 0.5em 0;
+  min-height: 1em;
+}
+
+/* 优化表格样式 */
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
+  font-size: 0.9em;
+}
+
+.prose th, .prose td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.prose th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.prose tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Word导入的表格特殊样式 */
+.prose .word-table {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.prose .word-table th {
+  background-color: #f3f4f6;
+  border-bottom: 2px solid #d1d5db;
+}
+
+.prose .word-table td {
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* 优化代码块样式 */
+.prose blockquote {
+  border-left: 4px solid #3b82f6;
+  background-color: #eff6ff;
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 0 6px 6px 0;
+}
+
+/* 目录组件优化 */
+.toc-item {
+  transition: all 0.2s ease;
+}
+
+.toc-item:hover {
+  background-color: #f8fafc;
+  border-left: 2px solid #3b82f6;
+}
+
+.toc-item.active {
+  background-color: #dbeafe;
+  border-left: 3px solid #2563eb;
+  font-weight: 500;
+}
+
+/* 响应式优化 */
+@media (max-width: 1024px) {
+  .prose {
+    font-size: 16px;
+  }
+  
+  .prose h1 {
+    font-size: 1.75em;
+  }
+  
+  .prose h2 {
+    font-size: 1.4em;
+  }
+  
+  .prose h3 {
+    font-size: 1.2em;
+  }
+}
+
+/* 修复内容渲染的特殊情况 */
+.prose div > p {
+  margin: 0.5em 0;
+}
+
+.prose div:empty {
+  display: none;
+}
+
+/* 确保图片正确显示 */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin: 1.5em auto;
+  display: block;
 }
