@@ -149,16 +149,6 @@ body {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
-/* 只允许enhanced-code-block的pre显示，其他隐藏 */
-.prose pre {
-  display: block;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: inherit;
-}
-
 /* enhanced-code-block内的pre完全重写样式 */
 .enhanced-code-block pre {
   display: block !important;
@@ -543,20 +533,22 @@ body {
   padding: 12px 16px;
   background: #f6f8fa;
   border: none;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.45;
   overflow-x: auto;
   overflow-y: visible;
   white-space: pre;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  color: #24292f;
+  color: #586069;
+  font-weight: 400;
 }
 
 .enhanced-code-block code {
   background: transparent;
-  color: #24292f;
+  color: #586069;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 400;
   white-space: pre;
   display: block;
   width: max-content;
@@ -569,8 +561,9 @@ body {
   padding: 12px 16px !important;
   background: #f6f8fa !important;
   border: none !important;
-  color: #24292f !important;
-  font-size: 13px !important;
+  color: #586069 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
   line-height: 1.45 !important;
   overflow-x: auto !important;
   white-space: pre !important;
@@ -578,9 +571,10 @@ body {
 
 .prose .enhanced-code-block code {
   background: transparent !important;
-  color: #24292f !important;
+  color: #586069 !important;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
   padding: 0 !important;
   border-radius: 0 !important;
   white-space: pre !important;
