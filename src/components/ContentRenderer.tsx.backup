@@ -1,12 +1,19 @@
 'use client'
 
 import ReactMarkdown from 'react-markdown'
+import { useEffect, useState } from 'react'
 
 interface ContentRendererProps {
   content: string
 }
 
 export default function ContentRenderer({ content }: ContentRendererProps) {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const isHtmlContent = (text: string): boolean => {
     const htmlRegex = /<[^>]+>/
     return htmlRegex.test(text)
@@ -20,6 +27,37 @@ export default function ContentRenderer({ content }: ContentRendererProps) {
     return /^#+\s+/m.test(textWithoutCode) ||
            text.includes('```') || 
            /^\*\s|^-\s|^\d+\.\s|^\|.*\|/m.test(textWithoutCode)
+  }
+
+  const createCodeBlock = (code: string, language: string = 'text') => {
+    // 添加行号 - 使用动态宽度对齐
+    const lines = code.split('\n')
+    const maxLineNumber = lines.length
+    const paddingWidth = Math.max(String(maxLineNumber).length, 2)
+    const numberedCode = lines.map((line: string, index: number) => 
+      `${String(index + 1).padStart(paddingWidth, ' ')}  ${line}`
+    ).join('\n')
+    
+    return (
+      <div className="enhanced-code-block">
+        <div className="code-header">
+          <span className="language-badge">{language === 'text' ? 'Plain Text' : language}</span>
+          <button 
+            className="copy-btn" 
+            onClick={() => navigator.clipboard.writeText(code)}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="m5 15-2-2 2-2"></path>
+            </svg>
+            复制代码
+          </button>
+        </div>
+        <pre>
+          <code className={`language-${language}`}>{numberedCode}</code>
+        </pre>
+      </div>
+    )
   }
 
   const addHeadingIds = (html: string): string => {
@@ -78,13 +116,13 @@ export default function ContentRenderer({ content }: ContentRendererProps) {
         language = 'python'
       }
       
-      // 添加行号
-      const lines = code.split('\n')
-      const maxLineNumber = lines.length
-      const paddingWidth = Math.max(String(maxLineNumber).length, 2)
-      const numberedLines = lines.map((line: string, index: number) => 
-        `${String(index + 1).padStart(paddingWidth, ' ')}  ${line}`
-      ).join('\n')
+             // 添加行号 - 使用动态宽度对齐
+       const lines = code.split('\n')
+       const maxLineNumber = lines.length
+       const paddingWidth = Math.max(String(maxLineNumber).length, 2)
+       const numberedLines = lines.map((line: string, index: number) => 
+         `${String(index + 1).padStart(paddingWidth, ' ')}  ${line}`
+       ).join('\n')
       
       return `<div class="enhanced-code-block">
         <div class="code-header">
@@ -102,7 +140,15 @@ export default function ContentRenderer({ content }: ContentRendererProps) {
     })
   }
 
-  // 直接渲染内容，绝对不要Loading状态
+  // 防止SSR不匹配，只在客户端渲染内容
+  if (!isClient) {
+    return (
+      <div className="prose prose-lg max-w-none">
+        <div className="text-gray-500">Loading content...</div>
+      </div>
+    )
+  }
+
   if (isHtmlContent(content)) {
     const processedHtml = addHeadingIds(processHtmlCodeBlocks(fixHtmlContent(content)))
     return (
@@ -187,13 +233,13 @@ export default function ContentRenderer({ content }: ContentRendererProps) {
               const language = match[1] || 'text'
               const code = String(children).replace(/\n$/, '')
               
-              // 添加行号
-              const lines = code.split('\n')
-              const maxLineNumber = lines.length
-              const paddingWidth = Math.max(String(maxLineNumber).length, 2)
-              const numberedCode = lines.map((line: string, index: number) => 
-                `${String(index + 1).padStart(paddingWidth, ' ')}  ${line}`
-              ).join('\n')
+                  // 添加行号 - 使用更好的对齐方式
+    const lines = code.split('\n')
+    const maxLineNumber = lines.length
+    const paddingWidth = Math.max(String(maxLineNumber).length, 2)
+    const numberedCode = lines.map((line: string, index: number) => 
+      `${String(index + 1).padStart(paddingWidth, ' ')}  ${line}`
+    ).join('\n')
               
               return (
                 <div className="enhanced-code-block">
@@ -238,4 +284,4 @@ export default function ContentRenderer({ content }: ContentRendererProps) {
       </div>
     )
   }
-} 
+}

@@ -138,40 +138,29 @@ body {
   border-radius: 0.25rem;
 }
 
-/* 确保所有pre标签都能显示 */
-.prose pre {
-  display: block;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: inherit;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--tw-prose-pre-code);
+  background-color: var(--tw-prose-pre-bg);
+  overflow-x: auto;
+  font-weight: 400;
+  font-size: 0.875em;
+  line-height: 1.7142857;
+  margin-top: 1.7142857em;
+  margin-bottom: 1.7142857em;
+  border-radius: 0.375rem;
+  padding: 0.8571429em 1.1428571em;
 }
 
-/* 只允许enhanced-code-block的pre显示，其他隐藏 */
-.prose pre {
-  display: block;
-  margin: 0;
+.prose :where(pre code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: transparent;
+  border-width: 0;
+  border-radius: 0;
   padding: 0;
-  background: transparent;
-  border: none;
+  font-weight: inherit;
   color: inherit;
-}
-
-/* enhanced-code-block内的pre完全重写样式 */
-.enhanced-code-block pre {
-  display: block !important;
-  margin: 0 !important;
-  padding: 12px 16px !important;
-  background: #f6f8fa !important;
-  border: none !important;
-  color: #24292f !important;
-  font-size: 13px !important;
-  line-height: 1.45 !important;
-  overflow-x: auto !important;
-  white-space: pre !important;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
 }
 
 .prose :where(table):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
@@ -449,7 +438,15 @@ body {
   font-weight: bold;
 }
 
+/* Enhanced code blocks - disable for enhanced-code-block */
+.prose :where(pre):not(.enhanced-code-block pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border: 1px solid rgb(55 65 81);
+  position: relative;
+}
 
+.prose :where(pre):not(.enhanced-code-block pre):before:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  display: none;
+}
 
 /* Enhanced list styling */
 .prose :where(ul > li):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
@@ -484,125 +481,563 @@ body {
   background-size: 100% 2px;
 }
 
+/* Clean Code Block Styling - Optimized */
+.enhanced-code-block, .simple-code-block {
+  margin: 1.5rem 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  overflow: visible;
+}
 
-/* 主要代码块容器 - 唯一边框，覆盖所有默认样式 */
-/* 最简单的代码块修复 - 解决多重边框问题 */
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #e1e4e8;
+  font-size: 12px;
+}
 
-/* 基本的enhanced-code-block样式 */
+.language-badge {
+  color: #586069;
+  font-weight: 500;
+  text-transform: lowercase;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #ffffff;
+  color: #586069;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.copy-btn:hover {
+  background: #f3f4f6;
+  border-color: #8b949e;
+  color: #24292f;
+}
+
+.copy-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.enhanced-code-block .code-content,
+.enhanced-code-block pre {
+  margin: 0 !important;
+  padding: 16px !important;
+  background: #f6f8fa !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+.enhanced-code-block code {
+  background: transparent !important;
+  color: #24292f !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: 400 !important;
+  white-space: pre;
+}
+
+/* Inline Code Styling */
+.enhanced-inline-code {
+  padding: 0.2em 0.4em !important;
+  background: #f3f4f6 !important;
+  color: #24292f !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 85% !important;
+  border-radius: 4px !important;
+  border: none !important;
+  font-weight: 400 !important;
+}
+
+/* Scrollbar for code blocks */
+.enhanced-code-block pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.enhanced-code-block pre::-webkit-scrollbar-track {
+  background: #f6f8fa;
+}
+
+.enhanced-code-block pre::-webkit-scrollbar-thumb {
+  background: #d0d7de;
+  border-radius: 3px;
+}
+
+.enhanced-code-block pre::-webkit-scrollbar-thumb:hover {
+  background: #8b949e;
+}
+
+/* Reset conflicting prose styles */
+.prose .enhanced-code-block {
+  margin: 1.5rem 0 !important;
+}
+
+.prose .enhanced-code-block pre {
+  margin: 0 !important;
+  padding: 16px !important;
+  background: #f6f8fa !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.prose .enhanced-code-block code {
+  background: transparent !important;
+  color: #24292f !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Standard prose code blocks fallback */
+.prose :where(pre):not(.enhanced-code-block pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: #f6f8fa !important;
+  border: 1px solid #e1e4e8 !important;
+  border-radius: 8px !important;
+  color: #24292f !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+/* Standard prose inline code fallback */
+.prose :where(:not(pre) > code):not(.enhanced-inline-code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: #f3f4f6 !important;
+  color: #24292f !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 4px !important;
+  border: none !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 85% !important;
+  font-weight: 400 !important;
+}
+
+/* 简洁代码块样式 */
+.simple-code-block {
+  margin: 1.5rem 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  overflow: visible;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.simple-code-block .code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f1f3f4;
+  border-bottom: 1px solid #d1d5db;
+  font-size: 12px;
+}
+
+.simple-code-block .language-badge {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.simple-code-block .copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #ffffff;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.simple-code-block .copy-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.simple-code-block .code-content {
+  padding: 12px;
+  background: #f8f9fa;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.simple-code-block .code-line {
+  display: flex;
+  align-items: flex-start;
+}
+
+.simple-code-block .line-number {
+  display: inline-block;
+  width: 30px;
+  color: #9ca3af;
+  text-align: right;
+  margin-right: 12px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.simple-code-block .line-content {
+  flex: 1;
+  white-space: pre;
+  color: #374151;
+}
+
+/* 修复HTML内容渲染问题 */
+.prose p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  line-height: 1.6;
+}
+
+.prose p:empty {
+  margin: 0.5em 0;
+  min-height: 1em;
+}
+
+/* 优化表格样式 */
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
+  font-size: 0.9em;
+}
+
+.prose th, .prose td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.prose th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.prose tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Word导入的表格特殊样式 */
+.prose .word-table {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.prose .word-table th {
+  background-color: #f3f4f6;
+  border-bottom: 2px solid #d1d5db;
+}
+
+.prose .word-table td {
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* 优化代码块样式 */
+.prose blockquote {
+  border-left: 4px solid #3b82f6;
+  background-color: #eff6ff;
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 0 6px 6px 0;
+}
+
+/* 目录组件优化 */
+.toc-item {
+  transition: all 0.2s ease;
+}
+
+.toc-item:hover {
+  background-color: #f8fafc;
+  border-left: 2px solid #3b82f6;
+}
+
+.toc-item.active {
+  background-color: #dbeafe;
+  border-left: 3px solid #2563eb;
+  font-weight: 500;
+}
+
+/* 响应式优化 */
+@media (max-width: 1024px) {
+  .prose {
+    font-size: 16px;
+  }
+  
+  .prose h1 {
+    font-size: 1.75em;
+  }
+  
+  .prose h2 {
+    font-size: 1.4em;
+  }
+  
+  .prose h3 {
+    font-size: 1.2em;
+  }
+}
+
+/* 修复内容渲染的特殊情况 */
+.prose div > p {
+  margin: 0.5em 0;
+}
+
+.prose div:empty {
+  display: none;
+}
+
+/* 确保图片正确显示 */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin: 1.5em auto;
+  display: block;
+}
+
+/* 自定义滚动条样式 */
+.prose pre::-webkit-scrollbar, .prose .enhanced-code-block::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose pre::-webkit-scrollbar-track, .prose .enhanced-code-block::-webkit-scrollbar-track {
+  background: #f1f3f4;
+  border-radius: 4px;
+}
+
+.prose pre::-webkit-scrollbar-thumb, .prose .enhanced-code-block::-webkit-scrollbar-thumb {
+  background: #c1c7cd;
+  border-radius: 4px;
+}
+
+.prose pre::-webkit-scrollbar-thumb:hover, .prose .enhanced-code-block::-webkit-scrollbar-thumb:hover {
+  background: #a8b3ba;
+}
+
+/* 确保所有代码块都使用统一的极简样式 - 无边框 */
+.prose pre:not(.enhanced-code-block pre):not(:where([class~="not-prose"], [class~="not-prose"] *)),
+.prose pre,
+.prose .enhanced-code-block pre,
+.prose .simple-code-block pre {
+  background: #f6f8fa !important;
+  border: none !important;
+  border-radius: 6px !important;
+  color: #24292f !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  padding: 16px !important;
+  overflow-x: auto !important;
+  margin: 1.5rem 0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 恢复代码块头部显示 */
+.code-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 8px 16px !important;
+  background: #f1f3f4 !important;
+  border-bottom: 1px solid #e1e4e8 !important;
+}
+
+.language-badge {
+  color: #6b7280 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.copy-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 4px 8px !important;
+  background: #ffffff !important;
+  color: #6b7280 !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  cursor: pointer !important;
+}
+
+/* 按照截图的代码块样式 */
+.enhanced-code-block,
+.simple-code-block {
+  background: #f8f9fa;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f1f3f4;
+  border-bottom: 1px solid #e1e5e9;
+  font-size: 12px;
+}
+
+.language-badge {
+  color: #999;
+  font-weight: normal;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+}
+
+.code-content {
+  padding: 12px;
+  background: #f8f9fa;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-x: auto;
+}
+
+.code-line {
+  display: flex;
+  align-items: flex-start;
+}
+
+.line-number {
+  display: inline-block;
+  width: 30px;
+  color: #999;
+  text-align: right;
+  margin-right: 12px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.line-content {
+  flex: 1;
+  white-space: pre;
+  color: #333;
+}
+
+.prose pre {
+  background: #f8f9fa !important;
+  border: 1px solid #e1e5e9 !important;
+  border-radius: 6px !important;
+  padding: 12px !important;
+  margin: 1.5rem 0 !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  overflow-x: auto !important;
+}
+
+.prose pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* 清理代码块样式 - 只保留enhanced-code-block的样式，移除其他冲突样式 */
+
+/* 禁用prose的默认pre样式，只让enhanced-code-block生效 */
+.prose :where(pre):not(.enhanced-code-block pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  display: none !important;
+}
+
+/* 最终的代码块样式 - 单一边框，简洁设计 */
 .enhanced-code-block {
   margin: 1.5rem 0;
-  border: 1px solid #e1e5e9;
+  background: transparent;
+  border: none;
   border-radius: 6px;
   overflow: hidden;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* 代码块头部 - 去掉额外的上下空白 */
 .enhanced-code-block .code-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 12px;
-  background: #f6f8fa;
+  padding: 8px 12px;
+  background: #f1f3f4;
   border-bottom: 1px solid #e1e5e9;
   font-size: 12px;
-  margin: 0;
-  line-height: 1.2;
 }
 
 .enhanced-code-block .language-badge {
-  color: #656d76;
+  color: #6b7280;
   font-weight: 500;
-  margin: 0;
-  padding: 0;
 }
 
 .enhanced-code-block .copy-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 6px;
+  padding: 4px 8px;
   background: #fff;
   border: 1px solid #d1d5db;
-  border-radius: 3px;
-  font-size: 11px;
-  color: #656d76;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #666;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .enhanced-code-block .copy-btn:hover {
   background: #f3f4f6;
-  color: #24292f;
+  color: #374151;
 }
 
-/* 代码内容 - 修复字体颜色、行号对齐、滚动条 */
 .enhanced-code-block pre {
-  margin: 0;
-  padding: 12px 16px;
-  background: #f6f8fa;
-  border: none;
-  font-size: 13px;
-  line-height: 1.45;
+  margin: 0 !important;
+  padding: 12px !important;
+  background: #f8f9fa !important;
+  border: none !important;
+  border-radius: 0 !important;
   overflow-x: auto;
-  overflow-y: visible;
-  white-space: pre;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  color: #24292f;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
 }
 
 .enhanced-code-block code {
-  background: transparent;
-  color: #24292f;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 13px;
-  white-space: pre;
-  display: block;
-  width: max-content;
-  min-width: 100%;
-}
-
-/* 强制覆盖prose样式，确保显示正确 */
-.prose .enhanced-code-block pre {
-  margin: 0 !important;
-  padding: 12px 16px !important;
-  background: #f6f8fa !important;
+  background: transparent !important;
+  padding: 0 !important;
   border: none !important;
   color: #24292f !important;
-  font-size: 13px !important;
-  line-height: 1.45 !important;
-  overflow-x: auto !important;
-  white-space: pre !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  white-space: pre;
 }
 
-.prose .enhanced-code-block code {
-  background: transparent !important;
-  color: #24292f !important;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
-  font-size: 13px !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  white-space: pre !important;
-  display: block !important;
-  width: max-content !important;
-  min-width: 100% !important;
-}
-
-/* 确保滚动条可见且可用 */
-.enhanced-code-block pre::-webkit-scrollbar {
-  height: 8px;
-}
-
-.enhanced-code-block pre::-webkit-scrollbar-track {
-  background: #f1f3f4;
-}
-
-.enhanced-code-block pre::-webkit-scrollbar-thumb {
-  background: #c1c7cd;
-  border-radius: 4px;
-}
-
-.enhanced-code-block pre::-webkit-scrollbar-thumb:hover {
-  background: #8b959e;
-}
