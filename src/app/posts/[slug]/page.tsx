@@ -60,29 +60,20 @@ export default async function PostPage({ params }: PostPageProps) {
         <div className="flex gap-8 py-8">
           {/* 主要内容区域 */}
           <article className="flex-1 min-w-0">
-            {/* 顶部导航 */}
-            <div className="flex items-center justify-between mb-6">
-              <Link 
-                href="/posts" 
-                className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors group"
-              >
-                <svg className="w-3 h-3 mr-1 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                返回文章列表
-              </Link>
-              {adminInfo && (
+            {/* 管理员编辑按钮 */}
+            {adminInfo && (
+              <div className="flex justify-end mb-6">
                 <Link
                   href={`/posts/edit/${slug}`}
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-xl hover:bg-blue-700 transition-all hover:shadow-lg"
+                  className="inline-flex items-center px-3 py-1.5 text-gray-600 text-sm border border-gray-300 rounded-md hover:border-gray-400 hover:text-gray-900 transition-all"
                 >
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
-                  编辑文章
+                  编辑
                 </Link>
-              )}
-            </div>
+              </div>
+            )}
             
             {/* 文章头部 - 优化版 */}
             <header className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
